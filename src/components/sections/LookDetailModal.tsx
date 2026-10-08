@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ChapterData } from "@/data/collection";
+import EnquiryForm from "./EnquiryForm";
 
 interface Props {
   look: ChapterData | null;
@@ -288,6 +289,7 @@ function Viewer360({ look, accent }: { look: ChapterData; accent: string }) {
 // ── Main Modal ────────────────────────────────────────────────────────────────
 export default function LookDetailModal({ look, onClose }: Props) {
   const [activeTab, setActiveTab] = useState<"design" | "details" | "care">("design");
+  const [enquiryOpen, setEnquiryOpen] = useState(false);
 
   // Close on Escape
   useEffect(() => {
@@ -624,16 +626,26 @@ export default function LookDetailModal({ look, onClose }: Props) {
                 ADD TO WISHLIST
               </button>
               <button
+                onClick={() => setEnquiryOpen(true)}
                 className="flex-1 py-4 font-sans text-[9px] tracking-[0.3em] uppercase border transition-colors hover:bg-white/5"
                 style={{ borderColor: `${accent}60`, color: accent }}
                 data-cursor="enter"
               >
-                REQUEST INQUIRY
+                REQUEST ENQUIRY
               </button>
             </div>
           </motion.div>
         </motion.div>
       )}
+
+      {/* Enquiry Form — rendered outside the look panel so it overlays everything */}
+      <EnquiryForm
+        isOpen={enquiryOpen}
+        onClose={() => setEnquiryOpen(false)}
+        lookTitle={look?.title ?? ""}
+        lookSubtitle={look?.subtitle ?? ""}
+        accent={accent}
+      />
     </AnimatePresence>
   );
 }
