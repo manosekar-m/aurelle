@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-onyx-dark text-ivory/60 py-20 px-6 md:px-12 border-t border-gold/10">
+    <footer id="contact" className="bg-onyx-dark text-ivory/60 py-20 px-6 md:px-12 border-t border-gold/10">
       <div className="container mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-12">
         <div className="flex flex-col gap-2">
           <Link href="/" className="group inline-block">
@@ -12,9 +12,12 @@ export default function Footer() {
               AURELLE
             </h2>
           </Link>
-          <p className="font-sans text-xs tracking-[0.3em] uppercase text-gold/80">
+          <p className="font-sans text-xs tracking-[0.3em] uppercase text-gold/80 mb-4">
             After Dark
           </p>
+          <a href="mailto:inquiries@aurelle.com" className="font-sans text-[10px] tracking-widest uppercase text-ivory/50 hover:text-gold transition-colors">
+            inquiries@aurelle.com
+          </a>
         </div>
 
         <nav className="flex flex-wrap gap-8 md:gap-12">
