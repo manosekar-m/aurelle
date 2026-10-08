@@ -47,7 +47,7 @@ export default function BrandIntro() {
                 whileInView={{ y: 0, opacity: 1 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 1, delay: i * 0.2, ease: [0.16, 1, 0.3, 1] }}
-                className="font-serif text-5xl md:text-7xl lg:text-8xl tracking-[0.1em] text-transparent bg-clip-text bg-[url('/images/hero-image.jpg')] bg-cover bg-center bg-no-repeat bg-fixed opacity-90"
+                className="font-serif text-5xl md:text-7xl lg:text-8xl tracking-[0.1em] text-transparent bg-clip-text bg-gradient-to-r from-gold via-champagne to-gold bg-[length:200%_auto] hover:bg-right transition-all duration-1000 ease-out opacity-90 pb-2"
               >
                 {word}
               </motion.div>
