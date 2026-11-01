@@ -8,12 +8,16 @@ import RunwayLineup from "@/components/sections/RunwayLineup";
 import AurelleWomanAndPhilosophy from "@/components/sections/AurelleWomanAndPhilosophy";
 import MaterialShowcase from "@/components/sections/MaterialShowcase";
 import FinalCTA from "@/components/sections/FinalCTA";
+import AIChatBot from "@/components/layout/AIChatBot";
 
 export default function Home() {
   return (
     <main className="bg-onyx text-ivory min-h-screen relative">
       <Preloader />
       <Navigation />
+      
+      {/* Haute Couture AI Stylist */}
+      <AIChatBot />
       
       <Hero />
       <BrandIntro />
