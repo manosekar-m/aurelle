@@ -43,13 +43,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Hide default cursor on desktop for custom cursor */
-@media (pointer: fine) {
-  body {
-    cursor: none;
-  }
-}
-
 /* Global utility classes for animations / visual effects */
 .bg-atmosphere {
   position: fixed;
