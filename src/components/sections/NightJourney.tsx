@@ -304,7 +304,7 @@ export default function NightJourney() {
                   </p>
 
                   {/* Materials */}
-                  <div className="flex flex-wrap gap-2 mb-12">
+                  <div className="flex flex-wrap gap-2 mb-8">
                     {chapter.materials.map((mat) => (
                       <span
                         key={mat}
@@ -315,6 +315,28 @@ export default function NightJourney() {
                       </span>
                     ))}
                   </div>
+
+                  {/* Client Rating Preview */}
+                  <button
+                    onClick={() => setActiveLook(chapter)}
+                    className="flex items-center gap-2.5 mb-5 group cursor-pointer text-left w-fit"
+                    title={`View client critiques for ${chapter.title}`}
+                  >
+                    <div className="flex items-center gap-0.5" style={{ color: accent.border }}>
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <span key={s} className="text-xs transition-transform duration-200 group-hover:scale-110">
+                          ★
+                        </span>
+                      ))}
+                    </div>
+                    <span className="font-sans text-[10px] tracking-[0.2em] font-medium text-ivory/90">
+                      {chapter.rating.toFixed(1)}
+                    </span>
+                    <span className="w-1 h-1 rounded-full bg-ivory/30" />
+                    <span className="font-sans text-[8px] tracking-[0.25em] uppercase text-ivory/50 group-hover:text-ivory transition-colors">
+                      {chapter.reviews.length} REVIEWS
+                    </span>
+                  </button>
 
                   {/* CTA */}
                   <button

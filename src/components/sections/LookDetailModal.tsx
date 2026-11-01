@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ChapterData } from "@/data/collection";
 import EnquiryForm from "./EnquiryForm";
+import LookReviews from "./LookReviews";
 
 interface Props {
   look: ChapterData | null;
@@ -288,7 +289,7 @@ function Viewer360({ look, accent }: { look: ChapterData; accent: string }) {
 
 // ── Main Modal ────────────────────────────────────────────────────────────────
 export default function LookDetailModal({ look, onClose }: Props) {
-  const [activeTab, setActiveTab] = useState<"design" | "details" | "care">("design");
+  const [activeTab, setActiveTab] = useState<"design" | "details" | "care" | "reviews">("design");
   const [enquiryOpen, setEnquiryOpen] = useState(false);
 
   // Close on Escape
@@ -393,20 +394,59 @@ export default function LookDetailModal({ look, onClose }: Props) {
               <p className="font-sans text-[10px] tracking-[0.25em] text-white/40 uppercase">
                 {look.personality}
               </p>
+
+              {/* Client Rating snippet link */}
+              <button
+                onClick={() => setActiveTab("reviews")}
+                className="flex items-center gap-2.5 mt-3 group cursor-pointer text-left w-fit"
+                title="View client reviews & ratings"
+              >
+                <div className="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <span
+                      key={i}
+                      className="text-xs transition-transform duration-200 group-hover:scale-110"
+                      style={{ color: accent }}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
+                <span className="font-sans text-[10px] tracking-[0.2em] font-medium text-white/90">
+                  {look.rating.toFixed(1)}
+                </span>
+                <span className="w-1 h-1 rounded-full bg-white/30" />
+                <span className="font-sans text-[8px] tracking-[0.25em] text-white/50 uppercase group-hover:text-white/80 transition-colors underline decoration-white/20 underline-offset-4">
+                  ({look.reviews?.length ?? 0} REVIEWS)
+                </span>
+              </button>
             </div>
 
             {/* Tab bar */}
             <div className="shrink-0 flex border-b" style={{ borderColor: `${accent}25` }}>
-              {(["design", "details", "care"] as const).map((tab) => (
+              {(["design", "details", "care", "reviews"] as const).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className="flex-1 py-4 font-sans text-[8px] tracking-[0.35em] uppercase transition-all duration-300 relative"
+                  className="flex-1 py-4 font-sans text-[8px] tracking-[0.3em] uppercase transition-all duration-300 relative flex items-center justify-center gap-1.5"
                   style={{
                     color: activeTab === tab ? accent : "rgba(255,255,255,0.35)",
                   }}
                 >
-                  {tab === "design" ? "DESIGN" : tab === "details" ? "DETAILS" : "CARE"}
+                  <span>
+                    {tab === "design"
+                      ? "DESIGN"
+                      : tab === "details"
+                      ? "DETAILS"
+                      : tab === "care"
+                      ? "CARE"
+                      : `REVIEWS (${look.reviews?.length ?? 0})`}
+                  </span>
+                  {tab === "reviews" && (
+                    <span className="text-[10px] leading-none" style={{ color: accent }}>
+                      ★
+                    </span>
+                  )}
                   {activeTab === tab && (
                     <motion.div
                       layoutId="tab-underline"
@@ -611,6 +651,11 @@ export default function LookDetailModal({ look, onClose }: Props) {
                       </p>
                     </div>
                   </motion.div>
+                )}
+
+                {/* ── REVIEWS TAB ── */}
+                {activeTab === "reviews" && (
+                  <LookReviews look={look} accent={accent} />
                 )}
               </AnimatePresence>
             </div>
