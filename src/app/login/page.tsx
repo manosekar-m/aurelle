@@ -22,6 +22,13 @@ import {
   ArrowLeft,
   Globe,
   ChevronDown,
+  MessageSquare,
+  Send,
+  Package,
+  CheckCircle2,
+  Inbox,
+  AlertCircle,
+  HelpCircle,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -29,13 +36,38 @@ import { collection } from "@/data/collection";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { user, login, signup, adminLogin, logout, enquiries, updateEnquiryStatus } = useAuth();
+  const {
+    user,
+    login,
+    signup,
+    adminLogin,
+    logout,
+    enquiries,
+    updateEnquiryStatus,
+    queries,
+    addQuery,
+    replyToQuery,
+    orderHistory,
+  } = useAuth();
   const { t, language, setLanguage, languages } = useLanguage();
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
 
   const [activeTab, setActiveTab] = useState<"login" | "signup" | "admin">("login");
-  const [adminSubTab, setAdminSubTab] = useState<"enquiries" | "inventory" | "metrics">("enquiries");
+  const [adminSubTab, setAdminSubTab] = useState<"enquiries" | "queries" | "inventory" | "metrics">("enquiries");
   const [enquiryFilter, setEnquiryFilter] = useState<"all" | "New" | "Fitting Scheduled" | "Completed">("all");
+  const [adminQueryFilter, setAdminQueryFilter] = useState<"all" | "Open" | "Replied">("all");
+
+  // Client Profile state
+  const [clientProfileTab, setClientProfileTab] = useState<"profile" | "orders" | "queries" | "make_query">("profile");
+  const [clientQuerySubject, setClientQuerySubject] = useState(t.profile.subjectOptions[0] || "International Shipping Enquiry");
+  const [clientQueryMessage, setClientQueryMessage] = useState("");
+  const [clientQuerySubmitted, setClientQuerySubmitted] = useState(false);
+  const [clientQueryLoading, setClientQueryLoading] = useState(false);
+
+  // Admin reply drafts
+  const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
+  const [replySendingId, setReplySendingId] = useState<string | null>(null);
+  const [replySuccessId, setReplySuccessId] = useState<string | null>(null);
 
   // Client Login form
   const [loginEmail, setLoginEmail] = useState("");
@@ -111,6 +143,33 @@ export default function LoginPage() {
     }
   };
 
+  const handleClientSubmitQuery = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!clientQueryMessage.trim()) return;
+
+    setClientQueryLoading(true);
+    setTimeout(() => {
+      addQuery(clientQuerySubject, clientQueryMessage.trim());
+      setClientQueryLoading(false);
+      setClientQuerySubmitted(true);
+      setClientQueryMessage("");
+    }, 350);
+  };
+
+  const handleAdminSendReply = (queryId: string) => {
+    const draft = replyDrafts[queryId]?.trim();
+    if (!draft) return;
+
+    setReplySendingId(queryId);
+    setTimeout(() => {
+      replyToQuery(queryId, draft);
+      setReplySendingId(null);
+      setReplySuccessId(queryId);
+      setReplyDrafts((prev) => ({ ...prev, [queryId]: "" }));
+      setTimeout(() => setReplySuccessId(null), 3500);
+    }, 350);
+  };
+
   const handleFillClientDemo = () => {
     setLoginEmail("vivienne@aurelle.com");
     setLoginPassword("aurelle2026");
@@ -124,6 +183,18 @@ export default function LoginPage() {
 
   const filteredEnquiries =
     enquiryFilter === "all" ? enquiries : enquiries.filter((e) => e.status === enquiryFilter);
+
+  const filteredAdminQueries =
+    adminQueryFilter === "all" ? queries : queries.filter((q) => q.status === adminQueryFilter);
+
+  const userQueries = user
+    ? queries.filter(
+        (q) =>
+          q.customerId === user.id ||
+          q.customerEmail.toLowerCase() === user.email.toLowerCase() ||
+          user.role === "client"
+      )
+    : [];
 
   const renderLanguageSelector = () => (
     <div className="relative">
@@ -182,7 +253,9 @@ export default function LoginPage() {
     </div>
   );
 
-  // If logged in as ADMIN, display the Maison Atelier Command Dashboard!
+  // ==========================================
+  // VIEW 1: ADMIN ATELIER COMMAND DASHBOARD
+  // ==========================================
   if (user && user.role === "admin") {
     return (
       <main className="min-h-screen bg-[#050505] text-ivory pt-24 pb-20 px-4 sm:px-8 lg:px-16 relative overflow-hidden">
@@ -241,14 +314,14 @@ export default function LoginPage() {
                 sub: t.adminDashboard.kpiActiveSeason,
               },
               {
+                label: t.adminDashboard.tabClientQueries || "Client Queries",
+                value: queries.length.toString(),
+                sub: `${queries.filter((q) => q.status === "Open").length} Awaiting Reply`,
+              },
+              {
                 label: t.adminDashboard.activeFittings,
                 value: enquiries.filter((e) => e.status === "Fitting Scheduled").length.toString(),
                 sub: t.adminDashboard.kpiAppointments,
-              },
-              {
-                label: t.adminDashboard.vipWaitlist,
-                value: "14",
-                sub: t.adminDashboard.kpiWaitlist,
               },
               {
                 label: t.adminDashboard.coutureConversion,
@@ -276,6 +349,7 @@ export default function LoginPage() {
           <div className="flex border-b border-gold/20 mb-6 gap-2 sm:gap-4 overflow-x-auto">
             {[
               { id: "enquiries", label: t.adminDashboard.tabEnquiries },
+              { id: "queries", label: `${t.adminDashboard.tabClientQueries} (${queries.length})` },
               { id: "inventory", label: t.adminDashboard.tabInventory },
               { id: "metrics", label: t.adminDashboard.tabMetrics },
             ].map((tab) => (
@@ -297,10 +371,9 @@ export default function LoginPage() {
             ))}
           </div>
 
-          {/* TAB 1: CLIENT ENQUIRIES LEDGER */}
+          {/* SUB-TAB 1: CLIENT ENQUIRIES LEDGER */}
           {adminSubTab === "enquiries" && (
             <div className="space-y-4">
-              {/* Filter Pills */}
               <div className="flex items-center gap-2 flex-wrap mb-4">
                 <span className="font-sans text-[8px] tracking-[0.25em] uppercase text-white/40 mr-2">
                   {t.adminDashboard.statusFilter}
@@ -325,7 +398,6 @@ export default function LoginPage() {
                 ))}
               </div>
 
-              {/* Table / List View */}
               <div className="border border-gold/20 bg-black/50 overflow-x-auto">
                 <table className="w-full text-left font-sans text-xs">
                   <thead className="border-b border-gold/20 text-[8px] tracking-[0.3em] uppercase text-gold bg-white/[0.02]">
@@ -404,7 +476,167 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* TAB 2: COLLECTION OVERSIGHT */}
+          {/* SUB-TAB 2: CLIENT DIRECT QUERIES & ADMIN REPLY SYSTEM */}
+          {adminSubTab === "queries" && (
+            <div className="space-y-6">
+              {/* Filter Pills */}
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="font-sans text-[8px] tracking-[0.25em] uppercase text-white/40 mr-1">
+                    {t.adminDashboard.statusFilter}
+                  </span>
+                  {[
+                    { id: "all", label: `${t.adminDashboard.queryFilterAll} (${queries.length})` },
+                    {
+                      id: "Open",
+                      label: `${t.adminDashboard.queryFilterOpen} (${queries.filter((q) => q.status === "Open").length})`,
+                    },
+                    {
+                      id: "Replied",
+                      label: `${t.adminDashboard.queryFilterReplied} (${queries.filter((q) => q.status === "Replied").length})`,
+                    },
+                  ].map((filter) => (
+                    <button
+                      key={filter.id}
+                      onClick={() => setAdminQueryFilter(filter.id as any)}
+                      className={`px-3 py-1 text-[8px] font-sans tracking-[0.2em] uppercase border transition-colors ${
+                        adminQueryFilter === filter.id
+                          ? "border-gold bg-gold/15 text-gold"
+                          : "border-white/10 text-white/40 hover:text-white"
+                      }`}
+                    >
+                      {filter.label}
+                    </button>
+                  ))}
+                </div>
+
+                <span className="font-sans text-[9px] text-white/40 uppercase tracking-widest">
+                  {t.adminDashboard.querySectionTitle}
+                </span>
+              </div>
+
+              {filteredAdminQueries.length === 0 ? (
+                <div className="text-center py-16 border border-gold/15 bg-black/40">
+                  <Inbox className="w-10 h-10 text-gold/40 mx-auto mb-3" />
+                  <p className="font-serif text-lg text-white/70">{t.adminDashboard.queryNoItems}</p>
+                </div>
+              ) : (
+                <div className="space-y-5">
+                  {filteredAdminQueries.map((item) => (
+                    <div
+                      key={item.id}
+                      className="border border-gold/25 bg-[#0a0a0a] p-6 rounded-sm shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all"
+                    >
+                      {/* Query Header */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4 mb-4">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-serif text-lg text-white font-medium">
+                              {item.customerName}
+                            </span>
+                            <span className="font-mono text-[10px] text-white/40">({item.customerEmail})</span>
+                          </div>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="font-sans text-[9px] uppercase tracking-wider text-gold font-semibold">
+                              {item.subject}
+                            </span>
+                            <span className="text-white/20">•</span>
+                            <span className="font-sans text-[8px] text-white/40 uppercase tracking-widest">
+                              {item.date}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div>
+                          <span
+                            className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[8px] font-sans tracking-[0.25em] uppercase border font-semibold ${
+                              item.status === "Open"
+                                ? "border-amber-400/50 bg-amber-500/10 text-amber-300"
+                                : "border-emerald-400/50 bg-emerald-500/10 text-emerald-300"
+                            }`}
+                          >
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                item.status === "Open" ? "bg-amber-400 animate-pulse" : "bg-emerald-400"
+                              }`}
+                            />
+                            {item.status === "Open" ? t.adminDashboard.queryStatusOpen : t.adminDashboard.queryStatusReplied}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Customer Question / Message */}
+                      <div className="mb-5 bg-white/[0.02] border-l-2 border-gold/40 p-4">
+                        <p className="font-sans text-xs text-white/80 leading-relaxed">
+                          "{item.message}"
+                        </p>
+                      </div>
+
+                      {/* Admin Reply Display (if replied) */}
+                      {item.adminReply && (
+                        <div className="mb-4 bg-gold/5 border border-gold/30 p-4 rounded-sm">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-1.5 text-gold text-[9px] font-sans font-semibold uppercase tracking-wider">
+                              <Crown size={12} />
+                              <span>{t.adminDashboard.queryReplyLabel}</span>
+                            </div>
+                            {item.adminReplyDate && (
+                              <span className="font-sans text-[8px] text-white/40 uppercase tracking-widest">
+                                {t.adminDashboard.queryRepliedOn} {item.adminReplyDate}
+                              </span>
+                            )}
+                          </div>
+                          <p className="font-sans text-xs text-white/90 leading-relaxed italic">
+                            {item.adminReply}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Reply Input Box */}
+                      <div className="pt-2">
+                        <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/40 mb-2">
+                          {item.adminReply ? "Update / Send Follow-up Response" : t.adminDashboard.queryColAction}
+                        </label>
+                        <div className="flex flex-col sm:flex-row gap-3">
+                          <textarea
+                            rows={2}
+                            value={replyDrafts[item.id] || ""}
+                            onChange={(e) =>
+                              setReplyDrafts((prev) => ({ ...prev, [item.id]: e.target.value }))
+                            }
+                            placeholder={t.adminDashboard.queryReplyPlaceholder}
+                            className="flex-1 bg-black/60 border border-gold/25 focus:border-gold px-3 py-2 text-xs text-white placeholder:text-white/20 outline-none transition-colors rounded-none"
+                          />
+                          <button
+                            type="button"
+                            disabled={!replyDrafts[item.id]?.trim() || replySendingId === item.id}
+                            onClick={() => handleAdminSendReply(item.id)}
+                            className="sm:w-44 py-3 px-4 bg-gradient-to-r from-gold via-champagne to-gold text-[#050505] font-sans text-[8px] tracking-[0.25em] uppercase font-semibold hover:opacity-90 disabled:opacity-40 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap self-stretch sm:self-auto"
+                          >
+                            {replySendingId === item.id ? (
+                              <span>Sending...</span>
+                            ) : replySuccessId === item.id ? (
+                              <>
+                                <Check size={12} />
+                                <span>Sent!</span>
+                              </>
+                            ) : (
+                              <>
+                                <Send size={11} />
+                                <span>{t.adminDashboard.queryReplySend}</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* SUB-TAB 3: COLLECTION OVERSIGHT */}
           {adminSubTab === "inventory" && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {collection.map((chapter) => (
@@ -444,7 +676,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* TAB 3: SALON METRICS */}
+          {/* SUB-TAB 4: SALON METRICS */}
           {adminSubTab === "metrics" && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="p-6 border border-gold/20 bg-black/40">
@@ -502,78 +734,505 @@ export default function LoginPage() {
     );
   }
 
-  // If logged in as CLIENT, show their VIP Member Account!
+  // ========================================================
+  // VIEW 2: CLIENT VIP PROFILE DASHBOARD (FULL MULTI-TAB)
+  // ========================================================
   if (user && user.role === "client") {
-    return (
-      <main className="min-h-screen bg-[#050505] text-ivory flex items-center justify-center p-6 relative">
-        <div className="absolute inset-0 bg-radial-gradient from-gold/10 via-transparent to-transparent pointer-events-none" />
+    const isVip =
+      user.membershipTier?.toLowerCase().includes("vip") ||
+      user.membershipTier?.toLowerCase().includes("circle") ||
+      user.membershipTier?.toLowerCase().includes("couture") ||
+      true; // All registered patrons enjoy VIP Maison status
 
-        <div className="w-full max-w-md border border-gold/30 bg-[#0d0d0d] p-8 rounded-sm shadow-[0_25px_70px_rgba(0,0,0,0.85)] relative">
-          <div className="flex items-center justify-between border-b border-gold/20 pb-4 mb-6">
-            <div className="flex items-center gap-2 text-gold">
-              <Sparkles size={14} />
-              <span className="font-sans text-[8px] tracking-[0.35em] uppercase font-semibold">
-                {t.auth.vipPatronTitle}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
+    return (
+      <main className="min-h-screen bg-[#050505] text-ivory pt-24 pb-20 px-4 sm:px-8 lg:px-16 relative overflow-hidden">
+        {/* Ambient gold glow */}
+        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-gold/10 blur-[180px] pointer-events-none" />
+
+        <div className="max-w-5xl mx-auto relative z-10">
+          {/* Top Header Bar */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gold/20 pb-6 mb-8">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 text-ivory/60 hover:text-gold font-sans text-[9px] tracking-[0.25em] uppercase transition-colors"
+            >
+              <ArrowLeft size={14} />
+              <span>{t.auth.returnToBoutique}</span>
+            </Link>
+
+            <div className="flex items-center gap-3">
               {renderLanguageSelector()}
               <button
                 onClick={logout}
-                className="text-white/40 hover:text-white flex items-center gap-1 font-sans text-[8px] tracking-wider uppercase transition-colors"
+                className="px-4 py-2 border border-gold/30 hover:border-gold hover:bg-gold/10 text-white/70 hover:text-white flex items-center gap-1.5 font-sans text-[8px] tracking-[0.25em] uppercase transition-colors"
               >
-                <LogOut size={11} />
+                <LogOut size={12} />
                 <span>{t.nav.logout}</span>
               </button>
             </div>
           </div>
 
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 rounded-full border border-gold/60 mx-auto flex items-center justify-center font-serif text-2xl text-gold bg-gold/10 mb-3 shadow-[0_0_20px_rgba(197,160,89,0.2)]">
-              {user.name.charAt(0)}
+          {/* Member Banner Card */}
+          <div className="border border-gold/30 bg-[#0a0a0a]/90 backdrop-blur-xl p-6 sm:p-8 rounded-sm shadow-[0_20px_60px_rgba(0,0,0,0.8)] mb-8 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gold/10 blur-2xl pointer-events-none" />
+
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+              <div className="flex items-center gap-5">
+                <div className="w-20 h-20 rounded-full border-2 border-gold/60 flex items-center justify-center font-serif text-3xl text-gold bg-gradient-to-br from-gold/20 to-black shrink-0 shadow-[0_0_25px_rgba(197,160,89,0.3)]">
+                  {user.name.charAt(0)}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <h1 className="font-serif text-2xl sm:text-3xl text-white tracking-wide">
+                      {user.name}
+                    </h1>
+                    {isVip ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[8px] font-sans tracking-[0.25em] uppercase bg-gradient-to-r from-gold/20 via-gold/30 to-gold/20 border border-gold/60 text-gold font-semibold shadow-[0_0_12px_rgba(197,160,89,0.3)]">
+                        <Crown size={10} />
+                        {t.profile.vipMember}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[8px] font-sans tracking-[0.25em] uppercase border border-white/20 text-white/60">
+                        {t.profile.standardMember}
+                      </span>
+                    )}
+                  </div>
+                  <p className="font-sans text-[10px] text-gold/80 tracking-[0.25em] uppercase">
+                    {user.membershipTier || t.auth.defaultTier}
+                  </p>
+                  <p className="font-sans text-xs text-white/50 mt-1">{user.email}</p>
+                </div>
+              </div>
+
+              {/* Quick stats pills */}
+              <div className="grid grid-cols-3 gap-3 w-full md:w-auto text-center border-t md:border-t-0 md:border-l border-white/10 pt-4 md:pt-0 md:pl-6">
+                <div className="p-2.5 bg-white/[0.02] border border-gold/15">
+                  <span className="font-sans text-[7px] tracking-[0.25em] uppercase text-white/40 block mb-1">
+                    STATUS
+                  </span>
+                  <span className="font-sans text-xs text-emerald-400 font-medium">VIP Active</span>
+                </div>
+                <div className="p-2.5 bg-white/[0.02] border border-gold/15">
+                  <span className="font-sans text-[7px] tracking-[0.25em] uppercase text-white/40 block mb-1">
+                    ORDERS
+                  </span>
+                  <span className="font-serif text-sm text-gold font-medium">{orderHistory.length}</span>
+                </div>
+                <div className="p-2.5 bg-white/[0.02] border border-gold/15">
+                  <span className="font-sans text-[7px] tracking-[0.25em] uppercase text-white/40 block mb-1">
+                    QUERIES
+                  </span>
+                  <span className="font-serif text-sm text-white font-medium">{userQueries.length}</span>
+                </div>
+              </div>
             </div>
-            <h2 className="font-serif text-2xl text-white tracking-wider">{user.name}</h2>
-            <p className="font-sans text-[9px] text-gold/80 tracking-[0.25em] uppercase mt-1">
-              {user.membershipTier || t.auth.defaultTier}
-            </p>
-            <p className="font-sans text-xs text-white/40 mt-1">{user.email}</p>
           </div>
 
-          <div className="border border-gold/20 p-4 bg-white/[0.02] mb-6 text-xs space-y-2">
-            <div className="flex justify-between text-white/60">
-              <span>{t.auth.memberStatus}</span>
-              <span className="text-emerald-400 font-medium">{t.auth.activeAllocations}</span>
-            </div>
-            <div className="flex justify-between text-white/60">
-              <span>{t.auth.privateConsultation}</span>
-              <span className="text-gold font-medium">{t.auth.complimentaryPriority}</span>
-            </div>
-            <div className="flex justify-between text-white/60">
-              <span>{t.auth.collectionPreview}</span>
-              <span className="text-white">{t.auth.previewSeason}</span>
-            </div>
+          {/* PROFILE NAVIGATION TABS */}
+          <div className="flex border-b border-gold/25 mb-8 gap-2 sm:gap-6 overflow-x-auto">
+            {[
+              { id: "profile", label: t.profile.tabProfile, icon: Crown },
+              { id: "orders", label: `${t.profile.tabOrders} (${orderHistory.length})`, icon: Package },
+              { id: "queries", label: `${t.profile.tabQueries} (${userQueries.length})`, icon: MessageSquare },
+              { id: "make_query", label: t.profile.tabMakeQuery, icon: Send },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = clientProfileTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    setClientProfileTab(tab.id as any);
+                    if (tab.id === "make_query") setClientQuerySubmitted(false);
+                  }}
+                  className={`py-3.5 px-3 sm:px-4 font-sans text-[9px] sm:text-[10px] tracking-[0.25em] uppercase transition-all relative flex items-center gap-2 whitespace-nowrap ${
+                    isActive ? "text-gold font-semibold" : "text-white/40 hover:text-white"
+                  }`}
+                >
+                  <Icon size={13} className={isActive ? "text-gold" : "text-white/30"} />
+                  <span>{tab.label}</span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="client-tab-line"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-gold via-champagne to-gold"
+                    />
+                  )}
+                </button>
+              );
+            })}
           </div>
 
-          <div className="flex flex-col gap-3">
-            <Link
-              href="/#collection"
-              className="w-full py-3.5 bg-gold text-[#050505] font-sans text-[9px] tracking-[0.3em] uppercase font-semibold text-center hover:bg-[#d8b56f] transition-all"
-            >
-              {t.auth.exploreCollectionBtn}
-            </Link>
-            <Link
-              href="/"
-              className="w-full py-3 border border-gold/30 text-white/70 font-sans text-[8px] tracking-[0.25em] uppercase text-center hover:text-white hover:border-gold transition-colors"
-            >
-              {t.auth.returnHomeBtn}
-            </Link>
-          </div>
+          {/* TAB 1: PROFILE DETAILS & VIP PRIVILEGES */}
+          {clientProfileTab === "profile" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Patron Credentials */}
+              <div className="border border-gold/25 bg-[#0a0a0a] p-6 rounded-sm">
+                <div className="flex items-center gap-2 border-b border-gold/15 pb-3 mb-5 text-gold">
+                  <Sparkles size={14} />
+                  <h3 className="font-sans text-[9px] tracking-[0.3em] uppercase font-semibold">
+                    PATRON CREDENTIALS
+                  </h3>
+                </div>
+
+                <div className="space-y-4 font-sans text-xs">
+                  <div className="flex justify-between items-center py-2 border-b border-white/5">
+                    <span className="text-white/50 uppercase text-[9px] tracking-wider">Full Name</span>
+                    <span className="text-white font-medium">{user.name}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-white/5">
+                    <span className="text-white/50 uppercase text-[9px] tracking-wider">{t.profile.email}</span>
+                    <span className="text-white font-mono text-[11px]">{user.email}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-white/5">
+                    <span className="text-white/50 uppercase text-[9px] tracking-wider">{t.profile.phone}</span>
+                    <span className="text-white">{user.phone || t.profile.noPhone}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2 border-b border-white/5">
+                    <span className="text-white/50 uppercase text-[9px] tracking-wider">
+                      {t.profile.memberSince}
+                    </span>
+                    <span className="text-gold font-medium">{user.joinDate || "2026 Season"}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-white/50 uppercase text-[9px] tracking-wider">VIP Tier</span>
+                    <span className="text-gold font-semibold tracking-wide">
+                      {user.membershipTier || t.auth.defaultTier}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* VIP Allocations & Privileges */}
+              <div className="border border-gold/25 bg-[#0a0a0a] p-6 rounded-sm flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 border-b border-gold/15 pb-3 mb-5 text-gold">
+                    <Crown size={14} />
+                    <h3 className="font-sans text-[9px] tracking-[0.3em] uppercase font-semibold">
+                      HAUTE COUTURE PRIVILEGES
+                    </h3>
+                  </div>
+
+                  <div className="space-y-3 font-sans text-xs mb-6">
+                    <div className="flex justify-between items-center p-3 bg-white/[0.02] border border-white/5">
+                      <span className="text-white/70">{t.auth.memberStatus}</span>
+                      <span className="text-emerald-400 font-medium text-[10px] tracking-wider uppercase">
+                        {t.auth.activeAllocations}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-white/[0.02] border border-white/5">
+                      <span className="text-white/70">{t.auth.privateConsultation}</span>
+                      <span className="text-gold font-medium text-[10px] tracking-wider uppercase">
+                        {t.auth.complimentaryPriority}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-white/[0.02] border border-white/5">
+                      <span className="text-white/70">{t.auth.collectionPreview}</span>
+                      <span className="text-white text-[10px] tracking-wider uppercase">
+                        {t.auth.previewSeason}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gold/15">
+                  <Link
+                    href="/#collection"
+                    className="flex-1 py-3 bg-gold text-[#050505] font-sans text-[9px] tracking-[0.25em] uppercase font-semibold text-center hover:bg-[#d8b56f] transition-all"
+                  >
+                    {t.auth.exploreCollectionBtn}
+                  </Link>
+                  <button
+                    onClick={() => setClientProfileTab("make_query")}
+                    className="flex-1 py-3 border border-gold/40 text-gold font-sans text-[9px] tracking-[0.25em] uppercase text-center hover:bg-gold/10 transition-colors"
+                  >
+                    {t.profile.tabMakeQuery}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: ORDER HISTORY */}
+          {clientProfileTab === "orders" && (
+            <div className="border border-gold/25 bg-[#0a0a0a] rounded-sm p-6">
+              <div className="flex items-center justify-between border-b border-gold/15 pb-4 mb-6">
+                <div>
+                  <h3 className="font-serif text-xl text-white tracking-wide">
+                    {t.profile.tabOrders}
+                  </h3>
+                  <p className="font-sans text-[10px] text-white/40 uppercase tracking-widest mt-0.5">
+                    Maison Aurelle Haute Couture Acquisitions
+                  </p>
+                </div>
+                <span className="font-sans text-[9px] text-gold tracking-widest uppercase">
+                  {orderHistory.length} Recorded Orders
+                </span>
+              </div>
+
+              {orderHistory.length === 0 ? (
+                <div className="text-center py-12">
+                  <Package className="w-10 h-10 text-gold/30 mx-auto mb-3" />
+                  <p className="font-sans text-xs text-white/50">{t.profile.ordersEmpty}</p>
+                </div>
+              ) : (
+                <div className="divide-y divide-white/10">
+                  {orderHistory.map((order) => (
+                    <div
+                      key={order.id}
+                      className="py-4.5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/[0.015] px-2 transition-colors"
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 bg-gold/10 border border-gold/30 rounded-sm flex items-center justify-center shrink-0">
+                          <Package size={20} className="text-gold" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-serif text-base text-white tracking-wide">
+                              {order.item}
+                            </h4>
+                            <span className="font-mono text-[9px] text-white/40">#{order.id}</span>
+                          </div>
+                          <p className="font-sans text-xs text-white/60">{order.subtitle}</p>
+                          <p className="font-sans text-[9px] text-white/40 uppercase tracking-wider mt-1">
+                            {order.date}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between sm:justify-end gap-6 self-end sm:self-center">
+                        <span className="font-serif text-base text-gold font-medium">
+                          {order.price}
+                        </span>
+                        <span
+                          className={`px-3 py-1 rounded-full text-[8px] font-sans tracking-[0.2em] uppercase border font-semibold ${
+                            order.status === "Delivered"
+                              ? "border-emerald-400/40 bg-emerald-500/10 text-emerald-300"
+                              : "border-sky-400/40 bg-sky-500/10 text-sky-300"
+                          }`}
+                        >
+                          {order.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 3: MY QUERIES (QUESTIONS & ADMIN REPLIES) */}
+          {clientProfileTab === "queries" && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gold/20 pb-4">
+                <div>
+                  <h3 className="font-serif text-xl text-white tracking-wide">
+                    {t.profile.tabQueries}
+                  </h3>
+                  <p className="font-sans text-[10px] text-white/40 uppercase tracking-widest mt-0.5">
+                    Direct communications with the Maison Atelier Directorate
+                  </p>
+                </div>
+                <button
+                  onClick={() => setClientProfileTab("make_query")}
+                  className="px-4 py-2 bg-gradient-to-r from-gold via-champagne to-gold text-[#050505] font-sans text-[8px] tracking-[0.25em] uppercase font-semibold hover:opacity-90 transition-opacity self-start sm:self-auto"
+                >
+                  + {t.profile.tabMakeQuery}
+                </button>
+              </div>
+
+              {userQueries.length === 0 ? (
+                <div className="text-center py-16 border border-gold/20 bg-[#0a0a0a] rounded-sm">
+                  <MessageSquare className="w-12 h-12 text-gold/30 mx-auto mb-3" />
+                  <p className="font-serif text-lg text-white/70 mb-2">{t.profile.myQueriesEmpty}</p>
+                  <p className="font-sans text-xs text-white/40 max-w-md mx-auto mb-6">
+                    Have a question regarding custom measurements, private styling, or order dispatch?
+                  </p>
+                  <button
+                    onClick={() => setClientProfileTab("make_query")}
+                    className="px-6 py-3 border border-gold text-gold font-sans text-[8px] tracking-[0.3em] uppercase hover:bg-gold hover:text-black transition-all"
+                  >
+                    {t.profile.tabMakeQuery}
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {userQueries.map((query) => (
+                    <div
+                      key={query.id}
+                      className="border border-gold/25 bg-[#0a0a0a] p-6 rounded-sm shadow-[0_10px_30px_rgba(0,0,0,0.6)]"
+                    >
+                      {/* Query Header */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3 mb-4">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-serif text-lg text-white font-medium">
+                              {query.subject}
+                            </h4>
+                          </div>
+                          <span className="font-sans text-[8px] text-white/40 uppercase tracking-widest">
+                            {t.profile.queryDate}: {query.date}
+                          </span>
+                        </div>
+
+                        <div>
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[8px] font-sans tracking-[0.2em] uppercase border font-semibold ${
+                              query.status === "Replied"
+                                ? "border-emerald-400/50 bg-emerald-500/10 text-emerald-300"
+                                : "border-amber-400/50 bg-amber-500/10 text-amber-300"
+                            }`}
+                          >
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                query.status === "Replied" ? "bg-emerald-400" : "bg-amber-400 animate-pulse"
+                              }`}
+                            />
+                            {query.status === "Replied" ? t.profile.queryStatusReplied : t.profile.queryStatusOpen}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Client's Message */}
+                      <div className="mb-4 bg-white/[0.02] p-4 rounded-sm border-l-2 border-white/20">
+                        <p className="font-sans text-xs text-white/80 leading-relaxed">
+                          {query.message}
+                        </p>
+                      </div>
+
+                      {/* Admin Atelier Reply (if present) */}
+                      {query.adminReply ? (
+                        <div className="mt-4 bg-gradient-to-r from-gold/15 via-gold/10 to-transparent border border-gold/40 p-4 rounded-sm relative">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2 text-gold">
+                              <Crown size={13} />
+                              <span className="font-sans text-[9px] tracking-[0.25em] uppercase font-semibold">
+                                {t.profile.adminReply} · Maison Director
+                              </span>
+                            </div>
+                            {query.adminReplyDate && (
+                              <span className="font-sans text-[8px] text-white/40 uppercase tracking-widest">
+                                {query.adminReplyDate}
+                              </span>
+                            )}
+                          </div>
+                          <p className="font-sans text-xs text-white leading-relaxed italic">
+                            "{query.adminReply}"
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2 text-amber-300/80 font-sans text-[9px] uppercase tracking-wider pt-2">
+                          <Clock size={12} className="animate-pulse" />
+                          <span>Awaiting response from Atelier Director (Typically within 24 hours)</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 4: MAKE A QUERY FORM */}
+          {clientProfileTab === "make_query" && (
+            <div className="max-w-2xl mx-auto border border-gold/30 bg-[#0a0a0a] p-6 sm:p-8 rounded-sm shadow-[0_20px_60px_rgba(0,0,0,0.85)]">
+              <div className="border-b border-gold/20 pb-4 mb-6">
+                <div className="flex items-center gap-2 text-gold mb-1">
+                  <MessageSquare size={16} />
+                  <span className="font-sans text-[9px] tracking-[0.35em] uppercase font-semibold">
+                    DIRECT CLIENT CONCIERGE
+                  </span>
+                </div>
+                <h3 className="font-serif text-2xl text-white tracking-wide">
+                  {t.profile.tabMakeQuery}
+                </h3>
+                <p className="font-sans text-xs text-white/50 mt-1">
+                  Submit inquiries directly to our Paris atelier stylists and executive directorship.
+                </p>
+              </div>
+
+              {clientQuerySubmitted ? (
+                <div className="text-center py-8 space-y-4">
+                  <div className="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-400/40 text-emerald-300 mx-auto flex items-center justify-center">
+                    <CheckCircle2 size={28} />
+                  </div>
+                  <h4 className="font-serif text-xl text-white tracking-wide">Inquiry Dispatched</h4>
+                  <p className="font-sans text-xs text-white/70 max-w-md mx-auto leading-relaxed">
+                    {t.profile.querySuccess}
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
+                    <button
+                      onClick={() => setClientProfileTab("queries")}
+                      className="px-6 py-3 bg-gold text-[#050505] font-sans text-[8px] tracking-[0.3em] uppercase font-semibold hover:bg-[#d8b56f] transition-colors"
+                    >
+                      VIEW IN MY QUERIES
+                    </button>
+                    <button
+                      onClick={() => setClientQuerySubmitted(false)}
+                      className="px-6 py-3 border border-gold/30 text-white/70 font-sans text-[8px] tracking-[0.25em] uppercase hover:text-white hover:border-gold transition-colors"
+                    >
+                      {t.profile.querySuccessReset}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={handleClientSubmitQuery} className="space-y-5">
+                  <div>
+                    <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/50 mb-2">
+                      {t.profile.querySubject}
+                    </label>
+                    <select
+                      value={clientQuerySubject}
+                      onChange={(e) => setClientQuerySubject(e.target.value)}
+                      className="w-full bg-black/60 border border-gold/30 px-4 py-3 font-sans text-xs text-white outline-none focus:border-gold transition-colors"
+                    >
+                      {t.profile.subjectOptions.map((opt) => (
+                        <option key={opt} value={opt} className="bg-black text-white">
+                          {opt}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/50 mb-2">
+                      {t.profile.queryMessage}
+                    </label>
+                    <textarea
+                      rows={5}
+                      required
+                      value={clientQueryMessage}
+                      onChange={(e) => setClientQueryMessage(e.target.value)}
+                      placeholder={t.profile.queryMessagePlaceholder}
+                      className="w-full bg-black/60 border border-gold/30 px-4 py-3 font-sans text-xs text-white placeholder:text-white/20 outline-none focus:border-gold transition-colors leading-relaxed"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={clientQueryLoading || !clientQueryMessage.trim()}
+                    className="w-full py-4 bg-gradient-to-r from-gold via-champagne to-gold text-[#050505] font-sans text-[9px] tracking-[0.35em] uppercase font-semibold hover:opacity-90 disabled:opacity-40 transition-all flex items-center justify-center gap-2"
+                  >
+                    {clientQueryLoading ? (
+                      <span>{t.profile.querySubmitting}</span>
+                    ) : (
+                      <>
+                        <Send size={13} />
+                        <span>{t.profile.querySubmit}</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+              )}
+            </div>
+          )}
         </div>
       </main>
     );
   }
 
-  // GUEST VIEW: 3-in-1 Luxury Auth Portal (Login, Signup, Admin Login)
+  // ========================================================
+  // VIEW 3: GUEST 3-IN-1 LUXURY PORTAL (LOGIN, SIGNUP, ADMIN)
+  // ========================================================
   return (
     <main className="min-h-screen bg-[#050505] text-ivory flex flex-col justify-between pt-24 pb-12 px-4 sm:px-6 relative overflow-hidden">
       {/* Background ambient lighting */}
@@ -598,66 +1257,67 @@ export default function LoginPage() {
 
       {/* Center Auth Card */}
       <div className="max-w-lg mx-auto w-full z-10">
-        <div className="bg-[#0b0b0b] border border-gold/30 rounded-sm p-6 sm:p-10 shadow-[0_25px_80px_rgba(0,0,0,0.9)] relative">
-          
-          {/* Decorative Corner Accents */}
-          <div className="absolute -top-1.5 -left-1.5 w-4 h-4 border-t-2 border-l-2 border-gold pointer-events-none" />
-          <div className="absolute -top-1.5 -right-1.5 w-4 h-4 border-t-2 border-r-2 border-gold pointer-events-none" />
-          <div className="absolute -bottom-1.5 -left-1.5 w-4 h-4 border-b-2 border-l-2 border-gold pointer-events-none" />
-          <div className="absolute -bottom-1.5 -right-1.5 w-4 h-4 border-b-2 border-r-2 border-gold pointer-events-none" />
-
-          {/* 3 Tab Switcher */}
-          <div className="grid grid-cols-3 border-b border-gold/20 mb-8 pb-1">
-            {[
-              { id: "login", label: t.auth.tabLogin },
-              { id: "signup", label: t.auth.tabSignup },
-              { id: "admin", label: t.auth.tabAdmin },
-            ].map((tab) => {
-              const isSelected = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => {
-                    setActiveTab(tab.id as any);
-                    setLoginError("");
-                    setSignupError("");
-                    setAdminError("");
-                  }}
-                  className={`py-3 text-center font-sans text-[8px] sm:text-[9px] tracking-[0.2em] uppercase transition-all relative ${
-                    isSelected ? "text-gold font-semibold" : "text-white/40 hover:text-white"
-                  }`}
-                >
-                  {tab.label}
-                  {isSelected && (
-                    <motion.div
-                      layoutId="auth-tab-underline"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-gold"
-                    />
-                  )}
-                </button>
-              );
-            })}
+        <div className="border border-gold/30 bg-[#0a0a0a]/90 backdrop-blur-xl p-8 sm:p-10 rounded-sm shadow-[0_20px_60px_rgba(0,0,0,0.8)] relative">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <span className="font-sans text-[9px] tracking-[0.35em] uppercase text-gold/80 font-medium block mb-2">
+              MAISON AURELLE · PRIVATE ATELIER
+            </span>
+            <h1 className="font-serif text-3xl sm:text-4xl text-white tracking-wider">
+              {t.auth.loginTitle}
+            </h1>
+            <p className="font-sans text-xs text-white/50 mt-2 font-light">
+              {t.auth.loginSubtitle}
+            </p>
           </div>
 
-          {/* ── TAB 1: CLIENT SIGN IN ── */}
+          {/* 3 Portal Selection Tabs */}
+          <div className="grid grid-cols-3 border border-gold/30 p-1 mb-8 bg-black/40">
+            <button
+              type="button"
+              onClick={() => setActiveTab("login")}
+              className={`py-2.5 font-sans text-[8px] sm:text-[9px] tracking-[0.25em] uppercase transition-all ${
+                activeTab === "login"
+                  ? "bg-gold text-[#050505] font-semibold shadow-sm"
+                  : "text-white/60 hover:text-white"
+              }`}
+            >
+              {t.auth.tabLogin}
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("signup")}
+              className={`py-2.5 font-sans text-[8px] sm:text-[9px] tracking-[0.25em] uppercase transition-all ${
+                activeTab === "signup"
+                  ? "bg-gold text-[#050505] font-semibold shadow-sm"
+                  : "text-white/60 hover:text-white"
+              }`}
+            >
+              {t.auth.tabSignup}
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("admin")}
+              className={`py-2.5 font-sans text-[8px] sm:text-[9px] tracking-[0.25em] uppercase transition-all ${
+                activeTab === "admin"
+                  ? "bg-gold text-[#050505] font-semibold shadow-sm"
+                  : "text-white/60 hover:text-white"
+              }`}
+            >
+              {t.auth.tabAdmin}
+            </button>
+          </div>
+
+          {/* TAB 1: CLIENT LOGIN */}
           {activeTab === "login" && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="text-center mb-6">
-                <h2 className="font-serif text-2xl sm:text-3xl text-white tracking-wider mb-1">
-                  {t.auth.loginTitle}
-                </h2>
-                <p className="font-sans text-xs text-white/50 leading-relaxed max-w-sm mx-auto font-light">
-                  {t.auth.loginSubtitle}
-                </p>
-              </div>
-
               <form onSubmit={handleClientLogin} className="space-y-5">
                 <div>
-                  <label className="block font-sans text-[8px] tracking-[0.35em] uppercase text-gold/80 mb-1.5">
+                  <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/60 mb-2">
                     {t.auth.emailLabel}
                   </label>
                   <div className="relative">
@@ -674,17 +1334,9 @@ export default function LoginPage() {
                 </div>
 
                 <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="font-sans text-[8px] tracking-[0.35em] uppercase text-gold/80">
-                      {t.auth.passwordLabel}
-                    </label>
-                    <button
-                      type="button"
-                      className="font-sans text-[8px] tracking-wider text-white/40 hover:text-gold transition-colors"
-                    >
-                      {t.auth.forgotPassword}
-                    </button>
-                  </div>
+                  <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/60 mb-2">
+                    {t.auth.passwordLabel}
+                  </label>
                   <div className="relative">
                     <input
                       type={showPassword ? "text" : "password"}
@@ -713,7 +1365,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={loginLoading}
-                  className="w-full py-4 bg-gold text-[#050505] font-sans text-[9px] tracking-[0.35em] uppercase font-semibold transition-all hover:bg-[#d8b56f] hover:shadow-[0_0_25px_rgba(197,160,89,0.3)] disabled:opacity-50"
+                  className="w-full py-4 bg-gradient-to-r from-gold via-champagne to-gold text-[#050505] font-sans text-[9px] tracking-[0.35em] uppercase font-semibold transition-all hover:opacity-90 disabled:opacity-50"
                 >
                   {loginLoading ? t.auth.authenticating : t.auth.btnSignIn}
                 </button>
@@ -735,83 +1387,91 @@ export default function LoginPage() {
             </motion.div>
           )}
 
-          {/* ── TAB 2: CLIENT SIGN UP (ATELIER MEMBERSHIP) ── */}
+          {/* TAB 2: CLIENT SIGNUP */}
           {activeTab === "signup" && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="text-center mb-6">
-                <h2 className="font-serif text-2xl sm:text-3xl text-white tracking-wider mb-1">
-                  {t.auth.signupTitle}
-                </h2>
-                <p className="font-sans text-xs text-white/50 leading-relaxed max-w-sm mx-auto font-light">
-                  {t.auth.signupSubtitle}
-                </p>
-              </div>
-
               <form onSubmit={handleClientSignup} className="space-y-4">
                 <div>
-                  <label className="block font-sans text-[8px] tracking-[0.35em] uppercase text-gold/80 mb-1">
+                  <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/60 mb-1.5">
                     {t.auth.fullNameLabel}
                   </label>
-                  <input
-                    type="text"
-                    required
-                    value={signupName}
-                    onChange={(e) => setSignupName(e.target.value)}
-                    placeholder={t.auth.fullNamePlaceholder}
-                    className="w-full bg-black/60 border border-gold/30 px-3.5 py-2.5 font-sans text-xs text-white placeholder:text-white/20 outline-none focus:border-gold"
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      required
+                      value={signupName}
+                      onChange={(e) => setSignupName(e.target.value)}
+                      placeholder={t.auth.fullNamePlaceholder}
+                      className="w-full bg-black/60 border border-gold/30 rounded-none px-4 py-2.5 font-sans text-xs text-white placeholder:text-white/20 outline-none focus:border-gold transition-colors"
+                    />
+                    <UserIcon size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30" />
+                  </div>
                 </div>
 
                 <div>
-                  <label className="block font-sans text-[8px] tracking-[0.35em] uppercase text-gold/80 mb-1">
+                  <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/60 mb-1.5">
                     {t.auth.emailLabel}
                   </label>
-                  <input
-                    type="email"
-                    required
-                    value={signupEmail}
-                    onChange={(e) => setSignupEmail(e.target.value)}
-                    placeholder={t.auth.emailPlaceholder}
-                    className="w-full bg-black/60 border border-gold/30 px-3.5 py-2.5 font-sans text-xs text-white placeholder:text-white/20 outline-none focus:border-gold"
-                  />
+                  <div className="relative">
+                    <input
+                      type="email"
+                      required
+                      value={signupEmail}
+                      onChange={(e) => setSignupEmail(e.target.value)}
+                      placeholder={t.auth.emailPlaceholder}
+                      className="w-full bg-black/60 border border-gold/30 rounded-none px-4 py-2.5 font-sans text-xs text-white placeholder:text-white/20 outline-none focus:border-gold transition-colors"
+                    />
+                    <Mail size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30" />
+                  </div>
                 </div>
 
                 <div>
-                  <label className="block font-sans text-[8px] tracking-[0.35em] uppercase text-gold/80 mb-1">
+                  <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/60 mb-1.5">
                     {t.auth.phoneLabel}
                   </label>
-                  <input
-                    type="tel"
-                    value={signupPhone}
-                    onChange={(e) => setSignupPhone(e.target.value)}
-                    placeholder={t.auth.phonePlaceholder}
-                    className="w-full bg-black/60 border border-gold/30 px-3.5 py-2.5 font-sans text-xs text-white placeholder:text-white/20 outline-none focus:border-gold"
-                  />
+                  <div className="relative">
+                    <input
+                      type="tel"
+                      value={signupPhone}
+                      onChange={(e) => setSignupPhone(e.target.value)}
+                      placeholder={t.auth.phonePlaceholder}
+                      className="w-full bg-black/60 border border-gold/30 rounded-none px-4 py-2.5 font-sans text-xs text-white placeholder:text-white/20 outline-none focus:border-gold transition-colors"
+                    />
+                    <Phone size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30" />
+                  </div>
                 </div>
 
                 <div>
-                  <label className="block font-sans text-[8px] tracking-[0.35em] uppercase text-gold/80 mb-1">
+                  <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/60 mb-1.5">
                     {t.auth.interestLabel}
                   </label>
                   <select
                     value={signupInterest}
                     onChange={(e) => setSignupInterest(e.target.value)}
-                    className="w-full bg-[#111] border border-gold/30 px-3 py-2.5 font-sans text-xs text-white outline-none cursor-pointer"
+                    className="w-full bg-black/60 border border-gold/30 rounded-none px-4 py-2.5 font-sans text-xs text-white outline-none focus:border-gold transition-colors"
                   >
-                    <option value="Gala & Red Carpet Eveningwear">{t.auth.interestGala}</option>
-                    <option value="Cocktail & Evening Receptions">{t.auth.interestCocktail}</option>
-                    <option value="Private Reception & Bridal Glamour">{t.auth.interestBridal}</option>
-                    <option value="Bespoke Made-to-Measure Couture">{t.auth.interestCustom}</option>
+                    <option value="Haute Couture Circle" className="bg-black text-white">
+                      {t.auth.interestGala}
+                    </option>
+                    <option value="Grand Gala & Red Carpet" className="bg-black text-white">
+                      {t.auth.interestCocktail}
+                    </option>
+                    <option value="Private Salon Viewing" className="bg-black text-white">
+                      {t.auth.interestBridal}
+                    </option>
+                    <option value="Bespoke Bridal & Soirée" className="bg-black text-white">
+                      {t.auth.interestCustom}
+                    </option>
                   </select>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block font-sans text-[8px] tracking-[0.35em] uppercase text-gold/80 mb-1">
+                    <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/60 mb-1.5">
                       {t.auth.passwordLabel}
                     </label>
                     <input
@@ -820,11 +1480,11 @@ export default function LoginPage() {
                       value={signupPassword}
                       onChange={(e) => setSignupPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full bg-black/60 border border-gold/30 px-3 py-2 font-sans text-xs text-white outline-none focus:border-gold"
+                      className="w-full bg-black/60 border border-gold/30 rounded-none px-3 py-2.5 font-sans text-xs text-white placeholder:text-white/20 outline-none focus:border-gold transition-colors"
                     />
                   </div>
                   <div>
-                    <label className="block font-sans text-[8px] tracking-[0.35em] uppercase text-gold/80 mb-1">
+                    <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/60 mb-1.5">
                       {t.auth.confirmPasswordLabel}
                     </label>
                     <input
@@ -833,7 +1493,7 @@ export default function LoginPage() {
                       value={signupConfirmPassword}
                       onChange={(e) => setSignupConfirmPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full bg-black/60 border border-gold/30 px-3 py-2 font-sans text-xs text-white outline-none focus:border-gold"
+                      className="w-full bg-black/60 border border-gold/30 rounded-none px-3 py-2.5 font-sans text-xs text-white placeholder:text-white/20 outline-none focus:border-gold transition-colors"
                     />
                   </div>
                 </div>
@@ -847,7 +1507,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={signupLoading}
-                  className="w-full py-3.5 bg-gold text-[#050505] font-sans text-[9px] tracking-[0.3em] uppercase font-semibold transition-all hover:bg-[#d8b56f] disabled:opacity-50 mt-2"
+                  className="w-full py-4 bg-gradient-to-r from-gold via-champagne to-gold text-[#050505] font-sans text-[9px] tracking-[0.35em] uppercase font-semibold transition-all hover:opacity-90 disabled:opacity-50 mt-2"
                 >
                   {signupLoading ? t.auth.creatingAccount : t.auth.btnCreateAccount}
                 </button>
@@ -855,28 +1515,28 @@ export default function LoginPage() {
             </motion.div>
           )}
 
-          {/* ── TAB 3: MAISON ADMIN PORTAL ── */}
+          {/* TAB 3: ADMIN LOGIN */}
           {activeTab === "admin" && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="text-center mb-6">
-                <div className="w-12 h-12 rounded-full border border-gold/40 mx-auto flex items-center justify-center font-serif text-xl text-gold bg-gold/10 mb-3 shadow-[0_0_15px_rgba(197,160,89,0.2)]">
-                  <Crown size={20} />
+              <div className="mb-6 p-3 bg-gold/10 border border-gold/30 text-center">
+                <div className="flex items-center justify-center gap-1.5 text-gold mb-1">
+                  <ShieldCheck size={14} />
+                  <span className="font-sans text-[8px] tracking-[0.3em] uppercase font-semibold">
+                    {t.auth.adminTitle}
+                  </span>
                 </div>
-                <h2 className="font-serif text-2xl sm:text-3xl text-white tracking-wider mb-1">
-                  {t.auth.adminTitle}
-                </h2>
-                <p className="font-sans text-xs text-white/50 leading-relaxed max-w-sm mx-auto font-light">
+                <p className="font-sans text-[10px] text-white/60 font-light">
                   {t.auth.adminSubtitle}
                 </p>
               </div>
 
               <form onSubmit={handleAdminSignIn} className="space-y-5">
                 <div>
-                  <label className="block font-sans text-[8px] tracking-[0.35em] uppercase text-gold/80 mb-1.5">
+                  <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/60 mb-2">
                     {t.auth.adminKeyLabel}
                   </label>
                   <div className="relative">
@@ -928,7 +1588,6 @@ export default function LoginPage() {
               </div>
             </motion.div>
           )}
-
         </div>
       </div>
 
@@ -939,4 +1598,3 @@ export default function LoginPage() {
     </main>
   );
 }
-

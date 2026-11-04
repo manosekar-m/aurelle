@@ -25,6 +25,28 @@ export interface AtelierEnquiry {
   status: "New" | "Fitting Scheduled" | "Completed";
 }
 
+export interface Query {
+  id: string;
+  customerId: string;
+  customerName: string;
+  customerEmail: string;
+  subject: string;
+  message: string;
+  date: string;
+  status: "Open" | "Replied" | "Closed";
+  adminReply?: string;
+  adminReplyDate?: string;
+}
+
+export interface OrderItem {
+  id: string;
+  item: string;
+  subtitle: string;
+  date: string;
+  status: "Delivered" | "Processing" | "Shipped" | "Cancelled";
+  price: string;
+}
+
 const DEFAULT_ENQUIRIES: AtelierEnquiry[] = [
   {
     id: "enq-01",
@@ -72,6 +94,70 @@ const DEFAULT_ENQUIRIES: AtelierEnquiry[] = [
   },
 ];
 
+const DEFAULT_QUERIES: Query[] = [
+  {
+    id: "qry-seed-01",
+    customerId: "usr-demo",
+    customerName: "Isabelle Fontaine",
+    customerEmail: "isabelle@example.com",
+    subject: "International Shipping to Monaco",
+    message: "I am based in Monaco and would like to understand your international shipping policy for the After Dark collection pieces. Do you offer insured delivery?",
+    date: "Nov 2, 2026",
+    status: "Replied",
+    adminReply: "Dear Isabelle, we offer fully insured DHL Express delivery to Monaco with signature confirmation. Delivery takes 3–5 business days after dispatch. Our atelier team will reach out to coordinate.",
+    adminReplyDate: "Nov 3, 2026",
+  },
+  {
+    id: "qry-seed-02",
+    customerId: "usr-demo2",
+    customerName: "Zara Al-Mansoor",
+    customerEmail: "zara@example.com",
+    subject: "Bespoke Embroidery on The Spotlight",
+    message: "I would like to inquire about adding a monogram embroidery in champagne thread to The Spotlight gown. Is this possible for private orders?",
+    date: "Nov 1, 2026",
+    status: "Open",
+  },
+  {
+    id: "qry-seed-03",
+    customerId: "usr-demo3",
+    customerName: "Priya Nair",
+    customerEmail: "priya@example.com",
+    subject: "VIP Membership Benefits",
+    message: "Could you elaborate on the exclusive benefits included with the Haute Couture Circle membership tier? I am interested in private showroom access.",
+    date: "Oct 29, 2026",
+    status: "Replied",
+    adminReply: "Dear Priya, the Haute Couture Circle grants you: priority access to seasonal previews, a dedicated stylist, complimentary alteration sessions, and invitation-only showroom events in Paris and Dubai.",
+    adminReplyDate: "Oct 30, 2026",
+  },
+];
+
+const MOCK_ORDERS: OrderItem[] = [
+  {
+    id: "ord-001",
+    item: "THE SPOTLIGHT",
+    subtitle: "Emerald Column Gown · Size 36 FR",
+    date: "Oct 15, 2026",
+    status: "Delivered",
+    price: "€4,850",
+  },
+  {
+    id: "ord-002",
+    item: "THE FLAPPER",
+    subtitle: "Beaded Fringe Cocktail · Size S",
+    date: "Sep 28, 2026",
+    status: "Delivered",
+    price: "€3,200",
+  },
+  {
+    id: "ord-003",
+    item: "THE PRELUDE",
+    subtitle: "Velvet Cocktail Midi · Size 38 FR",
+    date: "Nov 1, 2026",
+    status: "Processing",
+    price: "€2,750",
+  },
+];
+
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
@@ -87,6 +173,10 @@ interface AuthContextType {
   enquiries: AtelierEnquiry[];
   addEnquiry: (enquiry: Omit<AtelierEnquiry, "id" | "date" | "status">) => void;
   updateEnquiryStatus: (id: string, status: AtelierEnquiry["status"]) => void;
+  queries: Query[];
+  addQuery: (subject: string, message: string) => void;
+  replyToQuery: (id: string, replyText: string) => void;
+  orderHistory: OrderItem[];
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -98,13 +188,18 @@ const AuthContext = createContext<AuthContextType>({
   enquiries: DEFAULT_ENQUIRIES,
   addEnquiry: () => {},
   updateEnquiryStatus: () => {},
+  queries: DEFAULT_QUERIES,
+  addQuery: () => {},
+  replyToQuery: () => {},
+  orderHistory: MOCK_ORDERS,
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [enquiries, setEnquiries] = useState<AtelierEnquiry[]>(DEFAULT_ENQUIRIES);
+  const [queries, setQueries] = useState<Query[]>(DEFAULT_QUERIES);
 
-  // Restore stored session and enquiries
+  // Restore stored session and data
   useEffect(() => {
     try {
       const storedUser = localStorage.getItem("aurelle_auth_user");
@@ -114,6 +209,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const storedEnq = localStorage.getItem("aurelle_enquiries");
       if (storedEnq) {
         setEnquiries(JSON.parse(storedEnq));
+      }
+      const storedQueries = localStorage.getItem("aurelle_queries");
+      if (storedQueries) {
+        setQueries(JSON.parse(storedQueries));
       }
     } catch {
       // localStorage may fail in some environments
@@ -136,7 +235,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     // Simulated luxury authentication
     const trimmedEmail = email.trim().toLowerCase();
-    
+
     // Check if admin credentials entered in client login
     if (trimmedEmail === "admin@aurelle.com" || password === "aurelle-admin" || password === "maison2026") {
       const adminUser: User = {
@@ -245,6 +344,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const addQuery = (subject: string, message: string) => {
+    if (!user) return;
+    const newQuery: Query = {
+      id: `qry-${Date.now()}`,
+      customerId: user.id,
+      customerName: user.name,
+      customerEmail: user.email,
+      subject,
+      message,
+      date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+      status: "Open",
+    };
+    const updated = [newQuery, ...queries];
+    setQueries(updated);
+    try {
+      localStorage.setItem("aurelle_queries", JSON.stringify(updated));
+    } catch {
+      // ignore
+    }
+  };
+
+  const replyToQuery = (id: string, replyText: string) => {
+    const updated = queries.map((q) =>
+      q.id === id
+        ? {
+            ...q,
+            status: "Replied" as Query["status"],
+            adminReply: replyText,
+            adminReplyDate: new Date().toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            }),
+          }
+        : q
+    );
+    setQueries(updated);
+    try {
+      localStorage.setItem("aurelle_queries", JSON.stringify(updated));
+    } catch {
+      // ignore
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -256,6 +399,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         enquiries,
         addEnquiry,
         updateEnquiryStatus,
+        queries,
+        addQuery,
+        replyToQuery,
+        orderHistory: MOCK_ORDERS,
       }}
     >
       {children}
@@ -270,4 +417,3 @@ export function useAuth() {
   }
   return context;
 }
-
