@@ -406,7 +406,7 @@ export default function LookDetailModal({ look, onClose }: Props) {
                     <span
                       key={i}
                       className="text-xs transition-transform duration-200 group-hover:scale-110"
-                      style={{ color: accent }}
+                      style={{ color: i <= Math.round(look.rating) ? accent : "rgba(255,255,255,0.2)" }}
                     >
                       ★
                     </span>

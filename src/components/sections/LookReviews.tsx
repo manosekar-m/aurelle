@@ -37,13 +37,19 @@ export default function LookReviews({ look, accent }: Props) {
   const avgRating =
     totalReviews > 0
       ? (reviews.reduce((acc, r) => acc + r.rating, 0) / totalReviews).toFixed(1)
-      : "5.0";
+      : look.rating.toFixed(1);
+  const numericAvg = parseFloat(avgRating);
 
   const count5 = reviews.filter((r) => r.rating === 5).length;
   const count4 = reviews.filter((r) => r.rating === 4).length;
   const count3 = reviews.filter((r) => r.rating === 3).length;
   const count2 = reviews.filter((r) => r.rating === 2).length;
   const count1 = reviews.filter((r) => r.rating === 1).length;
+
+  const recommendPercent =
+    totalReviews > 0
+      ? Math.round(((count5 + count4) / totalReviews) * 100)
+      : 92;
 
   // Filtered reviews
   const displayedReviews = filterRating
@@ -151,8 +157,8 @@ export default function LookReviews({ look, accent }: Props) {
                 <Star
                   key={star}
                   size={16}
-                  className="fill-current"
-                  style={{ color: accent }}
+                  className={star <= Math.round(numericAvg) ? "fill-current" : "stroke-white/20 fill-transparent"}
+                  style={{ color: star <= Math.round(numericAvg) ? accent : "transparent" }}
                 />
               ))}
               <span className="ml-2 font-sans text-xs text-white/70 tracking-wider">
@@ -162,7 +168,7 @@ export default function LookReviews({ look, accent }: Props) {
 
             <p className="font-sans text-[9px] tracking-[0.25em] text-white/50 uppercase flex items-center gap-2">
               <Check size={12} style={{ color: accent }} />
-              100% OF ATELIER CLIENTS RECOMMEND THIS CREATION
+              {recommendPercent}% OF ATELIER CLIENTS RECOMMEND THIS CREATION
             </p>
           </div>
 
@@ -423,31 +429,43 @@ export default function LookReviews({ look, accent }: Props) {
           FILTER BY:
         </span>
         {[
-          { label: `ALL (${totalReviews})`, value: null },
-          { label: `5 STARS (${count5})`, value: 5 },
-          { label: `4 STARS (${count4})`, value: 4 },
-        ].map((tab) => {
-          const isSelected = filterRating === tab.value;
-          return (
-            <button
-              key={tab.label}
-              onClick={() => setFilterRating(tab.value)}
-              className="px-3 py-1.5 border font-sans text-[8px] tracking-[0.25em] uppercase transition-all duration-300"
-              style={{
-                borderColor: isSelected ? accent : "rgba(255,255,255,0.15)",
-                background: isSelected ? `${accent}15` : "transparent",
-                color: isSelected ? accent : "rgba(255,255,255,0.6)",
-              }}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
+          { label: `ALL (${totalReviews})`, value: null, count: totalReviews },
+          { label: `5 STARS (${count5})`, value: 5, count: count5 },
+          { label: `4 STARS (${count4})`, value: 4, count: count4 },
+          { label: `3 STARS (${count3})`, value: 3, count: count3 },
+          { label: `2 STARS (${count2})`, value: 2, count: count2 },
+          { label: `1 STAR (${count1})`, value: 1, count: count1 },
+        ]
+          .filter((tab) => tab.value === null || tab.count > 0)
+          .map((tab) => {
+            const isSelected = filterRating === tab.value;
+            return (
+              <button
+                key={tab.label}
+                onClick={() => setFilterRating(tab.value)}
+                className="px-3 py-1.5 border font-sans text-[8px] tracking-[0.25em] uppercase transition-all duration-300"
+                style={{
+                  borderColor: isSelected ? accent : "rgba(255,255,255,0.15)",
+                  background: isSelected ? `${accent}15` : "transparent",
+                  color: isSelected ? accent : "rgba(255,255,255,0.6)",
+                }}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
       </div>
 
       {/* ── REVIEWS LIST ── */}
       <div className="flex flex-col gap-6">
-        {displayedReviews.map((rev, index) => {
+        {displayedReviews.length === 0 ? (
+          <div className="py-12 text-center border border-dashed border-white/10 rounded-sm">
+            <p className="font-sans text-xs text-white/40 uppercase tracking-widest">
+              No client critiques found for this star tier.
+            </p>
+          </div>
+        ) : (
+          displayedReviews.map((rev, index) => {
           const currentHelpful = helpfulVotes[rev.id] ?? rev.helpfulCount;
           const hasVoted = userVoted[rev.id];
 
@@ -562,7 +580,8 @@ export default function LookReviews({ look, accent }: Props) {
               </div>
             </motion.div>
           );
-        })}
+        })
+      )}
       </div>
     </motion.div>
   );

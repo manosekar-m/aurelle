@@ -338,9 +338,15 @@ export default function NightJourney() {
                     className="flex items-center gap-2.5 mb-5 group cursor-pointer text-left w-fit"
                     title={`View client critiques for ${chapter.title}`}
                   >
-                    <div className="flex items-center gap-0.5" style={{ color: accent.border }}>
+                    <div className="flex items-center gap-0.5">
                       {[1, 2, 3, 4, 5].map((s) => (
-                        <span key={s} className="text-xs transition-transform duration-200 group-hover:scale-110">
+                        <span
+                          key={s}
+                          className="text-xs transition-transform duration-200 group-hover:scale-110"
+                          style={{
+                            color: s <= Math.round(chapter.rating) ? accent.border : "rgba(255,255,255,0.2)",
+                          }}
+                        >
                           ★
                         </span>
                       ))}

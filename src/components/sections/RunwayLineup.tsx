@@ -123,7 +123,19 @@ export default function RunwayLineup() {
 
                       {/* Stars & rating pill */}
                       <div className="flex items-center gap-1.5 mb-3">
-                        <span className="text-[10px]" style={{ color: accentColor }}>★★★★★</span>
+                        <div className="flex items-center gap-0.5">
+                          {[1, 2, 3, 4, 5].map((s) => (
+                            <span
+                              key={s}
+                              className="text-[10px]"
+                              style={{
+                                color: s <= Math.round(look.rating) ? accentColor : "rgba(255,255,255,0.2)",
+                              }}
+                            >
+                              ★
+                            </span>
+                          ))}
+                        </div>
                         <span className="font-sans text-[8px] tracking-wider text-ivory/80 font-medium">
                           {look.rating.toFixed(1)}
                         </span>
