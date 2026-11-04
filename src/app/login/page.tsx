@@ -20,6 +20,8 @@ import {
   Clock,
   ShieldCheck,
   ArrowLeft,
+  Globe,
+  ChevronDown,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -28,7 +30,8 @@ import { collection } from "@/data/collection";
 export default function LoginPage() {
   const router = useRouter();
   const { user, login, signup, adminLogin, logout, enquiries, updateEnquiryStatus } = useAuth();
-  const { t, language } = useLanguage();
+  const { t, language, setLanguage, languages } = useLanguage();
+  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
 
   const [activeTab, setActiveTab] = useState<"login" | "signup" | "admin">("login");
   const [adminSubTab, setAdminSubTab] = useState<"enquiries" | "inventory" | "metrics">("enquiries");
@@ -122,6 +125,63 @@ export default function LoginPage() {
   const filteredEnquiries =
     enquiryFilter === "all" ? enquiries : enquiries.filter((e) => e.status === enquiryFilter);
 
+  const renderLanguageSelector = () => (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gold/40 hover:border-gold bg-black/60 text-ivory/90 hover:text-gold transition-colors font-sans text-[9px] tracking-widest uppercase cursor-pointer"
+        aria-label="Change language"
+      >
+        <Globe size={11} className="text-gold" />
+        <span>{language.toUpperCase()}</span>
+        <ChevronDown size={10} className={`transition-transform duration-300 ${isLangMenuOpen ? "rotate-180" : ""}`} />
+      </button>
+
+      <AnimatePresence>
+        {isLangMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 8, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="absolute right-0 mt-2 w-48 bg-[#0a0a0a]/95 backdrop-blur-2xl border border-gold/30 rounded-sm shadow-[0_15px_40px_rgba(0,0,0,0.8)] py-1.5 z-50 overflow-hidden"
+          >
+            <div className="px-3 py-1.5 border-b border-gold/15 text-[7px] font-sans tracking-[0.3em] uppercase text-gold/70">
+              LANGUAGE · IDIOMA
+            </div>
+            {languages.map((lang) => {
+              const isCurrent = language === lang.code;
+              return (
+                <button
+                  type="button"
+                  key={lang.code}
+                  onClick={() => {
+                    setLanguage(lang.code);
+                    setIsLangMenuOpen(false);
+                  }}
+                  className={`w-full px-3 py-2 text-left font-sans text-xs flex items-center justify-between transition-colors ${
+                    isCurrent
+                      ? "bg-gold/15 text-gold font-medium"
+                      : "text-white/70 hover:bg-white/5 hover:text-white"
+                  }`}
+                >
+                  <div>
+                    <span className="font-sans text-[11px] block">{lang.nativeName}</span>
+                    <span className="font-sans text-[8px] text-white/40 tracking-wider uppercase block">
+                      {lang.region}
+                    </span>
+                  </div>
+                  {isCurrent && <Check size={12} className="text-gold" />}
+                </button>
+              );
+            })}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+
   // If logged in as ADMIN, display the Maison Atelier Command Dashboard!
   if (user && user.role === "admin") {
     return (
@@ -148,18 +208,19 @@ export default function LoginPage() {
                   </span>
                 </div>
                 <h1 className="font-serif text-2xl sm:text-3xl text-ivory tracking-wider mt-0.5">
-                  Directeur de la Maison
+                  {t.adminDashboard.directorTitle}
                 </h1>
                 <p className="font-sans text-xs text-white/50">{t.adminDashboard.welcome}</p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
+              {renderLanguageSelector()}
               <Link
                 href="/"
                 className="px-4 py-2 border border-gold/40 hover:bg-gold/10 font-sans text-[8px] tracking-[0.25em] uppercase text-ivory/80 transition-colors"
               >
-                VIEW BOUTIQUE
+                {t.adminDashboard.viewBoutique}
               </Link>
               <button
                 onClick={logout}
@@ -177,22 +238,22 @@ export default function LoginPage() {
               {
                 label: t.adminDashboard.totalEnquiries,
                 value: enquiries.length.toString(),
-                sub: "Active season requests",
+                sub: t.adminDashboard.kpiActiveSeason,
               },
               {
                 label: t.adminDashboard.activeFittings,
                 value: enquiries.filter((e) => e.status === "Fitting Scheduled").length.toString(),
-                sub: "Salon appointments booked",
+                sub: t.adminDashboard.kpiAppointments,
               },
               {
                 label: t.adminDashboard.vipWaitlist,
                 value: "14",
-                sub: "Private couture waitlist",
+                sub: t.adminDashboard.kpiWaitlist,
               },
               {
                 label: t.adminDashboard.coutureConversion,
                 value: "96%",
-                sub: "Inquiry to bespoke order",
+                sub: t.adminDashboard.kpiConversion,
               },
             ].map((kpi, idx) => (
               <div
@@ -242,7 +303,7 @@ export default function LoginPage() {
               {/* Filter Pills */}
               <div className="flex items-center gap-2 flex-wrap mb-4">
                 <span className="font-sans text-[8px] tracking-[0.25em] uppercase text-white/40 mr-2">
-                  STATUS FILTER:
+                  {t.adminDashboard.statusFilter}
                 </span>
                 {[
                   { id: "all", label: t.adminDashboard.filterAll },
@@ -354,7 +415,7 @@ export default function LoginPage() {
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-sans text-[8px] tracking-[0.3em] uppercase text-gold font-medium">
-                        CHAPTER {chapter.index} · {chapter.subtitle}
+                        {t.adminDashboard.chapterLabel} {chapter.index} · {chapter.subtitle}
                       </span>
                       <span className="px-2 py-0.5 border border-emerald-400/40 bg-emerald-500/10 text-emerald-300 text-[7px] tracking-wider uppercase">
                         {t.adminDashboard.stockAvailable}
@@ -388,15 +449,15 @@ export default function LoginPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="p-6 border border-gold/20 bg-black/40">
                 <h4 className="font-serif text-lg text-white tracking-wider mb-4">
-                  Haute Couture Inquiries by Garment
+                  {t.adminDashboard.metricsTitle}
                 </h4>
                 <div className="space-y-4">
                   {[
-                    { name: "The Spotlight (Emerald Gown)", pct: "42%", count: "19 Inquiries" },
-                    { name: "The Flapper (Beaded Fringe)", pct: "26%", count: "12 Inquiries" },
-                    { name: "The Prelude (Cocktail Midi)", pct: "18%", count: "9 Inquiries" },
-                    { name: "The Afterglow (Silver Jumpsuit)", pct: "10%", count: "5 Inquiries" },
-                    { name: "Midnight Rebel (Asymmetric Mini)", pct: "4%", count: "3 Inquiries" },
+                    { name: "The Spotlight (Emerald Gown)", pct: "42%", count: `19 ${t.adminDashboard.inquiriesCount}` },
+                    { name: "The Flapper (Beaded Fringe)", pct: "26%", count: `12 ${t.adminDashboard.inquiriesCount}` },
+                    { name: "The Prelude (Cocktail Midi)", pct: "18%", count: `9 ${t.adminDashboard.inquiriesCount}` },
+                    { name: "The Afterglow (Silver Jumpsuit)", pct: "10%", count: `5 ${t.adminDashboard.inquiriesCount}` },
+                    { name: "Midnight Rebel (Asymmetric Mini)", pct: "4%", count: `3 ${t.adminDashboard.inquiriesCount}` },
                   ].map((item) => (
                     <div key={item.name} className="space-y-1">
                       <div className="flex justify-between text-xs font-sans">
@@ -414,24 +475,24 @@ export default function LoginPage() {
               <div className="p-6 border border-gold/20 bg-black/40 flex flex-col justify-between">
                 <div>
                   <h4 className="font-serif text-lg text-white tracking-wider mb-2">
-                    Maison Aurelle Atelier Directorship
+                    {t.adminDashboard.directorshipTitle}
                   </h4>
                   <p className="font-sans text-xs text-white/60 leading-relaxed mb-6 font-light">
-                    Direct oversight of seasonal allocations across Paris, Milan, New York, Zurich, and Dubai private client salons. Inquiries submitted via the boutique interface are synchronized in real time.
+                    {t.adminDashboard.directorshipDesc}
                   </p>
                   <div className="p-4 border border-gold/30 bg-gold/5 text-xs text-ivory/80 space-y-1.5 font-sans">
                     <p className="font-medium text-gold uppercase tracking-wider text-[9px]">
-                      DIRECTOR SECURITY PROTOCOL
+                      {t.adminDashboard.securityProtocol}
                     </p>
                     <p className="text-[10px] text-white/60">
-                      Authorized passcodes: <code className="text-gold">AURELLE-ADMIN-777</code>, <code className="text-gold">maison2026</code>.
+                      {t.adminDashboard.authorizedPasscodes} <code className="text-gold">AURELLE-ADMIN-777</code>, <code className="text-gold">maison2026</code>.
                     </p>
                   </div>
                 </div>
 
                 <div className="pt-6 mt-6 border-t border-gold/15 flex justify-between items-center text-[9px] font-sans uppercase tracking-widest text-white/40">
-                  <span>Maison Aurelle Paris</span>
-                  <span>Encryption: 256-Bit SSL Atelier</span>
+                  <span>Maison Aurelle</span>
+                  <span>{t.adminDashboard.sslNotice}</span>
                 </div>
               </div>
             </div>
@@ -452,16 +513,19 @@ export default function LoginPage() {
             <div className="flex items-center gap-2 text-gold">
               <Sparkles size={14} />
               <span className="font-sans text-[8px] tracking-[0.35em] uppercase font-semibold">
-                VIP ATELIER PATRON
+                {t.auth.vipPatronTitle}
               </span>
             </div>
-            <button
-              onClick={logout}
-              className="text-white/40 hover:text-white flex items-center gap-1 font-sans text-[8px] tracking-wider uppercase transition-colors"
-            >
-              <LogOut size={11} />
-              <span>{t.nav.logout}</span>
-            </button>
+            <div className="flex items-center gap-2">
+              {renderLanguageSelector()}
+              <button
+                onClick={logout}
+                className="text-white/40 hover:text-white flex items-center gap-1 font-sans text-[8px] tracking-wider uppercase transition-colors"
+              >
+                <LogOut size={11} />
+                <span>{t.nav.logout}</span>
+              </button>
+            </div>
           </div>
 
           <div className="text-center mb-6">
@@ -470,23 +534,23 @@ export default function LoginPage() {
             </div>
             <h2 className="font-serif text-2xl text-white tracking-wider">{user.name}</h2>
             <p className="font-sans text-[9px] text-gold/80 tracking-[0.25em] uppercase mt-1">
-              {user.membershipTier || "Haute Couture Circle"}
+              {user.membershipTier || t.auth.defaultTier}
             </p>
             <p className="font-sans text-xs text-white/40 mt-1">{user.email}</p>
           </div>
 
           <div className="border border-gold/20 p-4 bg-white/[0.02] mb-6 text-xs space-y-2">
             <div className="flex justify-between text-white/60">
-              <span>Member Status</span>
-              <span className="text-emerald-400 font-medium">Active VIP Allocations</span>
+              <span>{t.auth.memberStatus}</span>
+              <span className="text-emerald-400 font-medium">{t.auth.activeAllocations}</span>
             </div>
             <div className="flex justify-between text-white/60">
-              <span>Private Consultation</span>
-              <span className="text-gold font-medium">Complimentary Priority</span>
+              <span>{t.auth.privateConsultation}</span>
+              <span className="text-gold font-medium">{t.auth.complimentaryPriority}</span>
             </div>
             <div className="flex justify-between text-white/60">
-              <span>Collection Preview</span>
-              <span className="text-white">Autumn/Winter 2026/27</span>
+              <span>{t.auth.collectionPreview}</span>
+              <span className="text-white">{t.auth.previewSeason}</span>
             </div>
           </div>
 
@@ -495,13 +559,13 @@ export default function LoginPage() {
               href="/#collection"
               className="w-full py-3.5 bg-gold text-[#050505] font-sans text-[9px] tracking-[0.3em] uppercase font-semibold text-center hover:bg-[#d8b56f] transition-all"
             >
-              EXPLORE AFTER DARK COLLECTION
+              {t.auth.exploreCollectionBtn}
             </Link>
             <Link
               href="/"
               className="w-full py-3 border border-gold/30 text-white/70 font-sans text-[8px] tracking-[0.25em] uppercase text-center hover:text-white hover:border-gold transition-colors"
             >
-              RETURN TO HOME
+              {t.auth.returnHomeBtn}
             </Link>
           </div>
         </div>
@@ -522,11 +586,14 @@ export default function LoginPage() {
           className="inline-flex items-center gap-2 text-ivory/60 hover:text-gold font-sans text-[9px] tracking-[0.25em] uppercase transition-colors"
         >
           <ArrowLeft size={14} />
-          <span>RETURN TO MAISON</span>
+          <span>{t.auth.returnToBoutique}</span>
         </Link>
-        <span className="font-serif text-lg tracking-widest text-gold font-medium">
-          AURELLE
-        </span>
+        <div className="flex items-center gap-4">
+          {renderLanguageSelector()}
+          <span className="font-serif text-lg tracking-widest text-gold font-medium">
+            AURELLE
+          </span>
+        </div>
       </div>
 
       {/* Center Auth Card */}
@@ -648,7 +715,7 @@ export default function LoginPage() {
                   disabled={loginLoading}
                   className="w-full py-4 bg-gold text-[#050505] font-sans text-[9px] tracking-[0.35em] uppercase font-semibold transition-all hover:bg-[#d8b56f] hover:shadow-[0_0_25px_rgba(197,160,89,0.3)] disabled:opacity-50"
                 >
-                  {loginLoading ? "AUTHENTICATING..." : t.auth.btnSignIn}
+                  {loginLoading ? t.auth.authenticating : t.auth.btnSignIn}
                 </button>
               </form>
 
@@ -736,7 +803,7 @@ export default function LoginPage() {
                     className="w-full bg-[#111] border border-gold/30 px-3 py-2.5 font-sans text-xs text-white outline-none cursor-pointer"
                   >
                     <option value="Gala & Red Carpet Eveningwear">{t.auth.interestGala}</option>
-                    <option value="Cocktail & Haute Soirées">{t.auth.interestCocktail}</option>
+                    <option value="Cocktail & Evening Receptions">{t.auth.interestCocktail}</option>
                     <option value="Private Reception & Bridal Glamour">{t.auth.interestBridal}</option>
                     <option value="Bespoke Made-to-Measure Couture">{t.auth.interestCustom}</option>
                   </select>
@@ -745,7 +812,7 @@ export default function LoginPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block font-sans text-[8px] tracking-[0.35em] uppercase text-gold/80 mb-1">
-                      PASSWORD
+                      {t.auth.passwordLabel}
                     </label>
                     <input
                       type="password"
@@ -782,7 +849,7 @@ export default function LoginPage() {
                   disabled={signupLoading}
                   className="w-full py-3.5 bg-gold text-[#050505] font-sans text-[9px] tracking-[0.3em] uppercase font-semibold transition-all hover:bg-[#d8b56f] disabled:opacity-50 mt-2"
                 >
-                  {signupLoading ? "CREATING MEMBERSHIP..." : t.auth.btnCreateAccount}
+                  {signupLoading ? t.auth.creatingAccount : t.auth.btnCreateAccount}
                 </button>
               </form>
             </motion.div>
@@ -842,7 +909,7 @@ export default function LoginPage() {
                   disabled={adminLoading}
                   className="w-full py-4 bg-gradient-to-r from-gold via-champagne to-gold text-[#050505] font-sans text-[9px] tracking-[0.35em] uppercase font-semibold transition-all hover:opacity-90 disabled:opacity-50"
                 >
-                  {adminLoading ? "VERIFYING DIRECTOR ACCESS..." : t.auth.btnAdminSignIn}
+                  {adminLoading ? t.auth.verifyingAccess : t.auth.btnAdminSignIn}
                 </button>
               </form>
 
@@ -867,7 +934,7 @@ export default function LoginPage() {
 
       {/* Footer Notice */}
       <div className="text-center font-sans text-[8px] tracking-[0.3em] uppercase text-white/30 mt-8 z-10">
-        Maison Aurelle · 256-Bit SSL Atelier Protection · Paris & Milano
+        {t.auth.footerNotice}
       </div>
     </main>
   );
