@@ -7,6 +7,7 @@ import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import { collection, ChapterData } from "@/data/collection";
 import Image from "next/image";
 import LookDetailModal from "@/components/sections/LookDetailModal";
+import { useLanguage } from "@/context/LanguageContext";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -24,6 +25,7 @@ const accentMap: Record<string, { glow: string; border: string }> = {
 export default function NightJourney() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeLook, setActiveLook] = useState<ChapterData | null>(null);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -159,9 +161,14 @@ export default function NightJourney() {
 
       {/* ── Teaser copy ── */}
       <div className="h-screen flex flex-col items-center justify-center text-center px-6 pointer-events-none">
-        {["ONE NIGHT.", "FIVE PERSONALITIES.", "FIVE CHAPTERS.", "ONE HOUSE LANGUAGE."].map((line, i) => (
+        {[
+          t.nightJourney.teaser1,
+          t.nightJourney.teaser2,
+          t.nightJourney.teaser3,
+          t.nightJourney.teaser4,
+        ].map((line, i) => (
           <motion.h2
-            key={line}
+            key={i}
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
@@ -179,6 +186,15 @@ export default function NightJourney() {
 
           {collection.map((chapter) => {
             const accent = accentMap[chapter.id] ?? accentMap["prelude"];
+            const chapterKey = `chapter${chapter.index}` as "chapter01" | "chapter02" | "chapter03" | "chapter04" | "chapter05";
+            const trChapter = t.nightJourney[chapterKey];
+            const title = trChapter?.title || chapter.title;
+            const subtitle = trChapter?.subtitle || chapter.subtitle;
+            const headline = trChapter?.headline || chapter.headline;
+            const subHeadline = ("subHeadline" in trChapter ? trChapter.subHeadline : undefined) || chapter.subHeadline;
+            const personality = trChapter?.personality || chapter.personality;
+            const description = trChapter?.description || chapter.description;
+
             return (
               <div
                 key={chapter.id}
@@ -268,39 +284,39 @@ export default function NightJourney() {
                     </span>
                     <span className="w-10 h-px" style={{ background: accent.border }} />
                     <span className="font-sans text-[9px] tracking-[0.35em] uppercase text-ivory/50">
-                      {chapter.subtitle}
+                      {subtitle}
                     </span>
                   </div>
 
                   {/* Title */}
                   <h3 className="font-serif text-4xl md:text-5xl xl:text-6xl text-ivory leading-none tracking-tight mb-5">
-                    {chapter.title}
+                    {title}
                   </h3>
 
                   {/* Sub-headline */}
-                  {chapter.subHeadline && (
+                  {subHeadline && (
                     <h4
                       className="font-serif text-xl md:text-2xl italic mb-5"
                       style={{ color: accent.border }}
                     >
-                      {chapter.subHeadline}
+                      {subHeadline}
                     </h4>
                   )}
 
                   {/* Main headline */}
                   <h4 className="font-serif text-xl md:text-2xl text-ivory/80 mb-6">
-                    {chapter.headline}
+                    {headline}
                   </h4>
 
                   {/* Personality tag */}
                   <p className="font-sans text-[10px] tracking-[0.25em] text-ivory/40 uppercase mb-8 leading-loose">
-                    {chapter.personality}
+                    {personality}
                   </p>
 
                   {/* Description */}
                   <p className="font-sans text-sm text-ivory/60 max-w-xs leading-relaxed mb-12 border-l-2 pl-4"
                     style={{ borderColor: accent.border }}>
-                    {chapter.description}
+                    {description}
                   </p>
 
                   {/* Materials */}

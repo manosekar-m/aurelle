@@ -3,6 +3,8 @@ import { Cormorant_Garamond, Inter } from "next/font/google";
 import "./globals.css";
 import React from "react";
 import SmoothScroll from "@/components/layout/SmoothScroll";
+import { LanguageProvider } from "@/context/LanguageContext";
+import { AuthProvider } from "@/context/AuthContext";
 
 const cormorant = Cormorant_Garamond({
   weight: ["300", "400", "500", "600", "700"],
@@ -31,10 +33,14 @@ export default function RootLayout({
       className={`${cormorant.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-onyx text-ivory">
-        <SmoothScroll>
-          <div className="bg-atmosphere" />
-          {children}
-        </SmoothScroll>
+        <LanguageProvider>
+          <AuthProvider>
+            <SmoothScroll>
+              <div className="bg-atmosphere" />
+              {children}
+            </SmoothScroll>
+          </AuthProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

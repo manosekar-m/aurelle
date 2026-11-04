@@ -2,9 +2,11 @@
 
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function BrandIntro() {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const { t } = useLanguage();
   
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -14,7 +16,12 @@ export default function BrandIntro() {
   const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
   const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0]);
 
-  const words = ["GLAMOUR.", "CONFIDENCE.", "MOVEMENT.", "INDIVIDUALITY."];
+  const words = [
+    t.brandIntro.word1,
+    t.brandIntro.word2,
+    t.brandIntro.word3,
+    t.brandIntro.word4,
+  ];
 
   return (
     <section 
@@ -32,11 +39,11 @@ export default function BrandIntro() {
 
       <motion.div style={{ y, opacity }} className="max-w-4xl mx-auto text-center">
         <h3 className="font-serif text-3xl md:text-5xl lg:text-6xl text-ivory leading-tight mb-16">
-          A WARDROBE FOR THE MOMENT THAT DESERVES TO BE <span className="italic text-gold">REMEMBERED.</span>
+          {t.brandIntro.headlinePart1} <span className="italic text-gold">{t.brandIntro.headlinePart2}</span>
         </h3>
         
         <p className="font-sans text-sm md:text-base text-ivory/70 tracking-widest leading-loose max-w-2xl mx-auto mb-32">
-          AURELLE IS A CONTEMPORARY LUXURY PARTY-WEAR BRAND CELEBRATING GLAMOUR, CONFIDENCE, MOVEMENT AND INDIVIDUALITY.
+          {t.brandIntro.description}
         </p>
 
         <div className="flex flex-col gap-12 md:gap-24">

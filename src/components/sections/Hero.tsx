@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { Sparkles, ArrowRight, Star, ShieldCheck, Eye } from "lucide-react";
 import { collection, ChapterData } from "@/data/collection";
+import { useLanguage } from "@/context/LanguageContext";
 import LookDetailModal from "./LookDetailModal";
 
 const FEATURED_LOOKS = [
@@ -53,8 +54,52 @@ const FEATURED_LOOKS = [
 export default function Hero() {
   const [activeTab, setActiveTab] = useState(0);
   const [modalLook, setModalLook] = useState<ChapterData | null>(null);
+  const { t } = useLanguage();
 
-  const currentFeature = FEATURED_LOOKS[activeTab];
+  const featuredLooks = [
+    {
+      id: "hero",
+      label: t.hero.lookHero,
+      title: t.hero.subTitle,
+      subtitle: "THE EDITORIAL ARCHIVE",
+      silhouette: "Haute Couture Eveningwear",
+      image: "/images/hero-image.jpg",
+      accent: "#C5A059",
+      chapterData: collection[0],
+    },
+    {
+      id: "spotlight",
+      label: t.hero.lookSpotlight,
+      title: "THE SPOTLIGHT",
+      subtitle: "THE CLIMAX",
+      silhouette: "Duchess Satin Column Gown with 1.2m Train",
+      image: "/images/look-03.jpg",
+      accent: "#14a862",
+      chapterData: collection[2],
+    },
+    {
+      id: "prelude",
+      label: t.hero.lookPrelude,
+      title: "THE PRELUDE",
+      subtitle: "THE ARRIVAL",
+      silhouette: "Asymmetric Silk Satin & Velvet Midi",
+      image: "/images/look-01.jpg",
+      accent: "#C5A059",
+      chapterData: collection[0],
+    },
+    {
+      id: "flapper",
+      label: t.hero.lookFlapper,
+      title: "THE FLAPPER",
+      subtitle: "THE CELEBRATION",
+      silhouette: "Art Deco Glass-Beaded Silk Fringe Shift",
+      image: "/images/look-02.jpg",
+      accent: "#F2E3C6",
+      chapterData: collection[1],
+    },
+  ];
+
+  const currentFeature = featuredLooks[activeTab] || featuredLooks[0];
 
   return (
     <>
@@ -87,7 +132,7 @@ export default function Hero() {
             >
               <Sparkles size={11} className="text-gold" />
               <span className="font-sans text-[8px] tracking-[0.35em] uppercase text-gold font-medium">
-                HAUTE COUTURE · LIMITED EDITION 2026/27
+                {t.hero.heritageTag}
               </span>
             </motion.div>
 
@@ -98,7 +143,7 @@ export default function Hero() {
               transition={{ duration: 1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
               className="font-serif text-6xl sm:text-7xl md:text-8xl xl:text-9xl leading-[0.9] tracking-[0.08em] text-ivory mb-2"
             >
-              AURELLE
+              {t.hero.title}
             </motion.h1>
 
             {/* Sub-Brand Title */}
@@ -108,7 +153,7 @@ export default function Hero() {
               transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
               className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl tracking-[0.2em] uppercase text-gold/90 mb-6 font-light"
             >
-              AFTER DARK
+              {t.hero.subTitle}
             </motion.h2>
 
             {/* Poetic Tagline */}
@@ -118,7 +163,7 @@ export default function Hero() {
               transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
               className="font-serif italic text-lg sm:text-xl text-ivory/90 mb-4 tracking-wide"
             >
-              &ldquo;Dress the Moment. Own the Night.&rdquo;
+              &ldquo;{t.hero.tagline}&rdquo;
             </motion.p>
 
             {/* Editorial Description */}
@@ -128,7 +173,7 @@ export default function Hero() {
               transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
               className="font-sans text-xs sm:text-sm text-ivory/60 leading-relaxed max-w-lg mb-8 font-light"
             >
-              An eveningwear collection crafted in five bespoke chapters — from the commanding arrival of structured velvet to the breathless, fluid climax of floor-grazing satin. Designed not merely to be seen, but to command every room.
+              {t.hero.description}
             </motion.p>
 
             {/* Action Buttons */}
@@ -142,7 +187,7 @@ export default function Hero() {
                 href="#collection"
                 className="group relative inline-flex items-center justify-center px-8 py-4 bg-gold text-[#050505] font-sans text-xs tracking-[0.3em] uppercase font-semibold transition-all duration-300 hover:bg-[#d8b56f] hover:shadow-[0_0_30px_rgba(197,160,89,0.4)]"
               >
-                <span>ENTER THE NIGHT</span>
+                <span>{t.hero.ctaPrimary}</span>
                 <ArrowRight size={14} className="ml-2 transition-transform duration-300 group-hover:translate-x-1" />
               </a>
 
@@ -150,7 +195,7 @@ export default function Hero() {
                 href="#the-night"
                 className="inline-flex items-center justify-center px-7 py-4 border border-gold/40 text-ivory/80 hover:text-white hover:border-gold font-sans text-xs tracking-[0.25em] uppercase transition-colors duration-300 bg-white/[0.02]"
               >
-                EXPLORE CHAPTERS
+                {t.hero.ctaSecondary}
               </a>
             </motion.div>
 
@@ -164,7 +209,7 @@ export default function Hero() {
               <div>
                 <p className="font-serif text-xl sm:text-2xl text-gold leading-none font-semibold mb-1">05</p>
                 <p className="font-sans text-[8px] sm:text-[9px] tracking-[0.2em] uppercase text-ivory/50">
-                  Bespoke Chapters
+                  {t.hero.metricChapters}
                 </p>
               </div>
 
@@ -174,14 +219,14 @@ export default function Hero() {
                   <span className="font-serif text-lg sm:text-xl text-white font-semibold leading-none">4.9</span>
                 </div>
                 <p className="font-sans text-[8px] sm:text-[9px] tracking-[0.2em] uppercase text-ivory/50">
-                  40+ Client Critiques
+                  {t.hero.metricCritiques}
                 </p>
               </div>
 
               <div>
                 <p className="font-serif text-xl sm:text-2xl text-gold leading-none font-semibold mb-1">100%</p>
                 <p className="font-sans text-[8px] sm:text-[9px] tracking-[0.2em] uppercase text-ivory/50">
-                  Silk Charmeuse & Velvet
+                  {t.hero.metricFabrics}
                 </p>
               </div>
             </motion.div>
@@ -257,7 +302,7 @@ export default function Hero() {
                     className="px-4 py-2.5 bg-gold text-[#050505] font-sans text-[8px] tracking-[0.25em] uppercase font-semibold shrink-0 transition-all hover:bg-white hover:scale-105 flex items-center gap-1.5 cursor-pointer"
                   >
                     <Eye size={12} />
-                    <span>EXPLORE LOOK</span>
+                    <span>{t.hero.exploreLook}</span>
                   </button>
                 </div>
 
@@ -265,7 +310,7 @@ export default function Hero() {
 
               {/* Look Switcher Pills: Instant interactive look previews */}
               <div className="mt-3 grid grid-cols-4 gap-1.5">
-                {FEATURED_LOOKS.map((item, idx) => {
+                {featuredLooks.map((item, idx) => {
                   const isActive = activeTab === idx;
                   return (
                     <button
