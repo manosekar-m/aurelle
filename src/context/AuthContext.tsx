@@ -160,9 +160,9 @@ const DEFAULT_ORDERS: OrderItem[] = [
     customerName: "Contessa Beatrice Moretti",
     customerEmail: "beatrice@moretti.it",
     customerPhone: "+39 02 8765 4321",
-    shippingAddress: "Via Montenapoleone 8, 20121 Milano, Italy",
+    shippingAddress: "Via Montenapoleone 8, 20121 Milan, Italy",
     item: "THE PRELUDE",
-    subtitle: "Velvet Cocktail Midi · Size 38 FR · Extended Hem",
+    subtitle: "Velvet Cocktail Dress · Size 38 FR · Extended Hem",
     date: "Nov 2, 2026",
     status: "Dispatched",
     price: "€2,750",
@@ -192,7 +192,7 @@ const DEFAULT_ORDERS: OrderItem[] = [
     customerPhone: "+1 (305) 555-0199",
     shippingAddress: "Star Island Dr, Miami Beach, FL 33139, USA",
     item: "THE AFTERGLOW",
-    subtitle: "Silver Lamé Jumpsuit · Size M",
+    subtitle: "Silver Metallic Jumpsuit · Size M",
     date: "Oct 25, 2026",
     status: "Delivered",
     price: "€3,600",
@@ -306,10 +306,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (trimmedEmail === "admin@aurelle.com" || password === "aurelle-admin" || password === "maison2026") {
       const adminUser: User = {
         id: "usr-admin-01",
-        name: "Maison Director",
+        name: "Store Director",
         email: "admin@aurelle.com",
         role: "admin",
-        title: "Atelier Executive Director",
+        title: "Executive Store Director",
         joinDate: "Founding Member",
       };
       saveUserSession(adminUser);
@@ -367,11 +367,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (validCodes.includes(code) || code.toLowerCase().includes("admin")) {
       const adminUser: User = {
         id: "usr-admin-director",
-        name: "Directeur de la Maison",
+        name: "Executive Director",
         email: "direction@aurelle.com",
         role: "admin",
-        title: "Executive Haute Couture Director",
-        membershipTier: "Maison Sovereign Council",
+        title: "Executive Store Director",
+        membershipTier: "Executive Board",
         joinDate: "Founding Directorate",
       };
       saveUserSession(adminUser);

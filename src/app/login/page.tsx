@@ -179,7 +179,7 @@ export default function LoginPage() {
     setAdminLoading(false);
 
     if (!res.success) {
-      setAdminError(res.message || "Invalid Maison Security Passcode.");
+      setAdminError(res.message || "Invalid Admin Security Passcode.");
     }
   };
 
@@ -342,18 +342,18 @@ export default function LoginPage() {
         <div className="absolute top-2/3 left-1/4 w-[500px] h-[500px] bg-champagne/5 blur-[160px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto relative z-10">
-          {/* Executive Telemetry & Global Salon Strip */}
+          {/* Executive Telemetry & Global Store Strip */}
           <div className="mb-6 p-2.5 bg-black/60 border border-gold/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-[8px] font-sans tracking-widest uppercase">
             <div className="flex items-center gap-3">
               <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                LIVE ATELIER NODE · ONLINE
+                LIVE STORE NODE · ONLINE
               </span>
               <span className="text-white/20">|</span>
-              <span className="text-white/50">PARIS · MILAN · DUBAI · NYC · ZÜRICH</span>
+              <span className="text-white/50">PARIS · MILAN · DUBAI · NYC · ZURICH</span>
             </div>
             <div className="flex items-center gap-4 text-gold/80 flex-wrap">
-              <span>SALON LOCAL TIME:</span>
+              <span>LOCAL STORE TIME:</span>
               <span className="text-white/80">PARIS <strong className="text-white">10:45 CET</strong></span>
               <span className="text-white/80">DUBAI <strong className="text-white">13:45 GST</strong></span>
               <span className="text-white/80">NYC <strong className="text-white">04:45 EST</strong></span>
@@ -366,7 +366,7 @@ export default function LoginPage() {
               <Link
                 href="/"
                 className="p-2.5 border border-gold/40 hover:border-gold hover:bg-gold/10 rounded-full text-gold transition-colors flex items-center justify-center shadow-[0_0_15px_rgba(197,160,89,0.2)]"
-                title="Return to Boutique"
+                title="Return to Store"
               >
                 <ArrowLeft size={16} />
               </Link>
@@ -381,7 +381,7 @@ export default function LoginPage() {
                   {t.adminDashboard.directorTitle}
                 </h1>
                 <p className="font-sans text-xs text-white/50 font-light mt-0.5">
-                  {t.adminDashboard.welcome} · Executive Suite
+                  {t.adminDashboard.welcome}
                 </p>
               </div>
             </div>
@@ -408,9 +408,9 @@ export default function LoginPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {[
               {
-                label: "GROSS ATELIER REVENUE",
+                label: "TOTAL GROSS REVENUE",
                 value: `€${totalGrossRevenue.toLocaleString()}`,
-                sub: "+28.4% YoY Gala Growth",
+                sub: "+28.4% YoY Season Growth",
                 trend: true,
                 icon: DollarSign,
               },
@@ -431,7 +431,7 @@ export default function LoginPage() {
               {
                 label: t.adminDashboard.coutureConversion,
                 value: "96.4%",
-                sub: "Consultation to Haute Order",
+                sub: "Consultation to Confirmed Order",
                 trend: true,
                 icon: TrendingUp,
               },
@@ -511,14 +511,14 @@ export default function LoginPage() {
                     <div className="flex items-center gap-2 text-gold mb-1">
                       <TrendingUp size={16} />
                       <span className="font-sans text-[8px] tracking-[0.35em] uppercase font-semibold">
-                        HAUTE COUTURE FISCAL INTELLIGENCE
+                        EXECUTIVE FINANCIAL INTELLIGENCE
                       </span>
                     </div>
                     <h2 className="font-serif text-2xl sm:text-3xl text-white tracking-wide">
-                      Maison Aurelle Revenue Trajectory
+                      Aurelle Revenue Trajectory
                     </h2>
                     <p className="font-sans text-xs text-white/50 mt-1">
-                      Aggregated private salon revenue, bespoke commissions, and VIP order velocity.
+                      Aggregated store sales, custom orders, and VIP client purchase velocity.
                     </p>
                   </div>
 
@@ -548,7 +548,7 @@ export default function LoginPage() {
                           : "text-white/50 hover:text-white"
                       }`}
                     >
-                      Autumn / Winter Gala
+                      Autumn / Winter Season
                     </button>
                   </div>
                 </div>
@@ -579,7 +579,7 @@ export default function LoginPage() {
                       COMMISSIONED LOOKS
                     </span>
                     <span className="font-serif text-lg text-white font-medium">
-                      {currentMonthData.ordersCount} Bespoke Orders
+                      {currentMonthData.ordersCount} Custom Orders
                     </span>
                   </div>
                   <div>
@@ -722,29 +722,29 @@ export default function LoginPage() {
                 </div>
 
                 <div className="flex items-center justify-between text-[8px] font-sans tracking-widest uppercase text-white/40 pt-4 border-t border-white/5">
-                  <span>Hover or tap any month marker to inspect bespoke revenue analytics</span>
-                  <span className="text-gold font-medium">Audited Atelier Books · Fiscal 2026</span>
+                  <span>Hover or tap any month marker to inspect sales analytics</span>
+                  <span className="text-gold font-medium">Audited Store Books · Fiscal 2026</span>
                 </div>
               </div>
 
               {/* Three Strategic Breakdown Panels */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* 1. Global Salon Distribution */}
+                {/* 1. Global Store Distribution */}
                 <div className="border border-gold/25 bg-[#0a0a0a] p-6 rounded-sm">
                   <div className="flex items-center justify-between border-b border-gold/15 pb-3 mb-5">
                     <span className="font-sans text-[8px] tracking-[0.3em] uppercase text-gold font-semibold">
-                      SALON REVENUE DISTRIBUTION
+                      STORE REVENUE BY CITY
                     </span>
                     <Globe size={12} className="text-gold" />
                   </div>
 
                   <div className="space-y-4">
                     {[
-                      { city: "Paris (Flagship Atelier)", share: "38%", amount: "€76,532" },
-                      { city: "Milano (Fashion Suite)", share: "24%", amount: "€48,336" },
-                      { city: "Dubai (Emirates Salon)", share: "20%", amount: "€40,280" },
+                      { city: "Paris (Flagship Store)", share: "38%", amount: "€76,532" },
+                      { city: "Milan (Fashion Suite)", share: "24%", amount: "€48,336" },
+                      { city: "Dubai (Emirates Store)", share: "20%", amount: "€40,280" },
                       { city: "New York (Private Client)", share: "12%", amount: "€24,168" },
-                      { city: "Zürich (High Jewelry Salon)", share: "6%", amount: "€12,084" },
+                      { city: "Zurich (Luxury Store)", share: "6%", amount: "€12,084" },
                     ].map((salon) => (
                       <div key={salon.city} className="space-y-1">
                         <div className="flex justify-between text-xs font-sans">
@@ -763,7 +763,7 @@ export default function LoginPage() {
                 <div className="border border-gold/25 bg-[#0a0a0a] p-6 rounded-sm">
                   <div className="flex items-center justify-between border-b border-gold/15 pb-3 mb-5">
                     <span className="font-sans text-[8px] tracking-[0.3em] uppercase text-gold font-semibold">
-                      REVENUE BY BESPOKE CREATION
+                      REVENUE BY DRESS COLLECTION
                     </span>
                     <Sparkles size={12} className="text-gold" />
                   </div>
@@ -772,8 +772,8 @@ export default function LoginPage() {
                     {[
                       { name: "THE SPOTLIGHT (Emerald Gown)", pct: "42%", total: "€84,588" },
                       { name: "THE FLAPPER (Beaded Fringe)", pct: "26%", total: "€52,364" },
-                      { name: "THE PRELUDE (Velvet Midi)", pct: "18%", total: "€36,252" },
-                      { name: "THE AFTERGLOW (Silver Lamé)", pct: "10%", total: "€20,140" },
+                      { name: "THE PRELUDE (Velvet Cocktail Dress)", pct: "18%", total: "€36,252" },
+                      { name: "THE AFTERGLOW (Silver Metallic Jumpsuit)", pct: "10%", total: "€20,140" },
                       { name: "MIDNIGHT REBEL (Asymmetric)", pct: "4%", total: "€8,056" },
                     ].map((dress) => (
                       <div key={dress.name} className="space-y-1">
@@ -794,18 +794,18 @@ export default function LoginPage() {
                   <div>
                     <div className="flex items-center justify-between border-b border-gold/15 pb-3 mb-5">
                       <span className="font-sans text-[8px] tracking-[0.3em] uppercase text-gold font-semibold">
-                        DIRECTORATE FINANCIAL BENCHMARKS
+                        EXECUTIVE FINANCIAL BENCHMARKS
                       </span>
                       <Crown size={12} className="text-gold" />
                     </div>
 
                     <div className="space-y-4 font-sans text-xs">
                       <div className="flex justify-between py-2 border-b border-white/5">
-                        <span className="text-white/50 uppercase text-[8px] tracking-wider">Average Commission (AOV)</span>
+                        <span className="text-white/50 uppercase text-[8px] tracking-wider">Average Order Value (AOV)</span>
                         <span className="text-white font-mono font-medium">€3,420</span>
                       </div>
                       <div className="flex justify-between py-2 border-b border-white/5">
-                        <span className="text-white/50 uppercase text-[8px] tracking-wider">Peak Single Commission</span>
+                        <span className="text-white/50 uppercase text-[8px] tracking-wider">Peak Single Order</span>
                         <span className="text-gold font-mono font-medium">€6,850</span>
                       </div>
                       <div className="flex justify-between py-2 border-b border-white/5">
@@ -813,7 +813,7 @@ export default function LoginPage() {
                         <span className="text-emerald-400 font-mono font-medium">92.4%</span>
                       </div>
                       <div className="flex justify-between py-2">
-                        <span className="text-white/50 uppercase text-[8px] tracking-wider">Gross Couture Margin</span>
+                        <span className="text-white/50 uppercase text-[8px] tracking-wider">Gross Profit Margin</span>
                         <span className="text-white font-mono font-medium">88.5%</span>
                       </div>
                     </div>
@@ -1425,7 +1425,7 @@ export default function LoginPage() {
                 </div>
 
                 <div className="pt-6 mt-6 border-t border-gold/15 flex justify-between items-center text-[9px] font-sans uppercase tracking-widest text-white/40">
-                  <span>Maison Aurelle</span>
+                  <span>House of Aurelle</span>
                   <span>{t.adminDashboard.sslNotice}</span>
                 </div>
               </div>
@@ -1836,7 +1836,7 @@ export default function LoginPage() {
                             <div className="flex items-center gap-2 text-gold">
                               <Crown size={13} />
                               <span className="font-sans text-[9px] tracking-[0.25em] uppercase font-semibold">
-                                {t.profile.adminReply} · Maison Director
+                                {t.profile.adminReply} · Store Director
                               </span>
                             </div>
                             {query.adminReplyDate && (
@@ -1852,7 +1852,7 @@ export default function LoginPage() {
                       ) : (
                         <div className="flex items-center gap-2 text-amber-300/80 font-sans text-[9px] uppercase tracking-wider pt-2">
                           <Clock size={12} className="animate-pulse" />
-                          <span>Awaiting response from Atelier Director (Typically within 24 hours)</span>
+                          <span>Awaiting response from Store Director (Typically within 24 hours)</span>
                         </div>
                       )}
                     </div>
