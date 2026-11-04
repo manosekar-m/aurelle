@@ -29,6 +29,8 @@ import {
   Inbox,
   AlertCircle,
   HelpCircle,
+  Truck,
+  RotateCcw,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -47,15 +49,21 @@ export default function LoginPage() {
     queries,
     addQuery,
     replyToQuery,
+    orders,
     orderHistory,
+    updateOrderStatus,
   } = useAuth();
   const { t, language, setLanguage, languages } = useLanguage();
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
 
   const [activeTab, setActiveTab] = useState<"login" | "signup" | "admin">("login");
-  const [adminSubTab, setAdminSubTab] = useState<"enquiries" | "queries" | "inventory" | "metrics">("enquiries");
+  const [adminSubTab, setAdminSubTab] = useState<"enquiries" | "orders" | "queries" | "inventory" | "metrics">("enquiries");
   const [enquiryFilter, setEnquiryFilter] = useState<"all" | "New" | "Fitting Scheduled" | "Completed">("all");
+  const [adminOrderFilter, setAdminOrderFilter] = useState<"all" | "Processing" | "Dispatched" | "Delivered" | "Cancelled">("all");
   const [adminQueryFilter, setAdminQueryFilter] = useState<"all" | "Open" | "Replied">("all");
+
+  const [orderNotification, setOrderNotification] = useState<string | null>(null);
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
 
   // Client Profile state
   const [clientProfileTab, setClientProfileTab] = useState<"profile" | "orders" | "queries" | "make_query">("profile");
@@ -170,6 +178,16 @@ export default function LoginPage() {
     }, 350);
   };
 
+  const handleUpdateOrderStatus = (orderId: string, status: "Processing" | "Dispatched" | "Delivered" | "Cancelled") => {
+    setUpdatingOrderId(orderId);
+    setTimeout(() => {
+      updateOrderStatus(orderId, status);
+      setUpdatingOrderId(null);
+      setOrderNotification(`Order #${orderId} updated to: ${status}`);
+      setTimeout(() => setOrderNotification(null), 4000);
+    }, 250);
+  };
+
   const handleFillClientDemo = () => {
     setLoginEmail("vivienne@aurelle.com");
     setLoginPassword("aurelle2026");
@@ -183,6 +201,9 @@ export default function LoginPage() {
 
   const filteredEnquiries =
     enquiryFilter === "all" ? enquiries : enquiries.filter((e) => e.status === enquiryFilter);
+
+  const filteredAdminOrders =
+    adminOrderFilter === "all" ? orders : orders.filter((o) => o.status === adminOrderFilter);
 
   const filteredAdminQueries =
     adminQueryFilter === "all" ? queries : queries.filter((q) => q.status === adminQueryFilter);
@@ -314,14 +335,14 @@ export default function LoginPage() {
                 sub: t.adminDashboard.kpiActiveSeason,
               },
               {
+                label: t.adminDashboard.tabOrders,
+                value: orders.length.toString(),
+                sub: `${orders.filter((o) => o.status === "Processing" || o.status === "Dispatched").length} Active Fulfillments`,
+              },
+              {
                 label: t.adminDashboard.tabClientQueries || "Client Queries",
                 value: queries.length.toString(),
                 sub: `${queries.filter((q) => q.status === "Open").length} Awaiting Reply`,
-              },
-              {
-                label: t.adminDashboard.activeFittings,
-                value: enquiries.filter((e) => e.status === "Fitting Scheduled").length.toString(),
-                sub: t.adminDashboard.kpiAppointments,
               },
               {
                 label: t.adminDashboard.coutureConversion,
@@ -349,6 +370,7 @@ export default function LoginPage() {
           <div className="flex border-b border-gold/20 mb-6 gap-2 sm:gap-4 overflow-x-auto">
             {[
               { id: "enquiries", label: t.adminDashboard.tabEnquiries },
+              { id: "orders", label: `${t.adminDashboard.tabOrders} (${orders.length})` },
               { id: "queries", label: `${t.adminDashboard.tabClientQueries} (${queries.length})` },
               { id: "inventory", label: t.adminDashboard.tabInventory },
               { id: "metrics", label: t.adminDashboard.tabMetrics },
@@ -476,7 +498,238 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* SUB-TAB 2: CLIENT DIRECT QUERIES & ADMIN REPLY SYSTEM */}
+          {/* SUB-TAB 2: CLIENT ORDERS PAGE & STATUS UPDATES */}
+          {adminSubTab === "orders" && (
+            <div className="space-y-6">
+              {/* Filter Pills */}
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-sans text-[8px] tracking-[0.25em] uppercase text-white/40 mr-1">
+                    {t.adminDashboard.statusFilter}
+                  </span>
+                  {[
+                    { id: "all", label: `${t.adminDashboard.orderFilterAll} (${orders.length})` },
+                    {
+                      id: "Processing",
+                      label: `${t.adminDashboard.orderFilterProcessing} (${orders.filter((o) => o.status === "Processing").length})`,
+                    },
+                    {
+                      id: "Dispatched",
+                      label: `${t.adminDashboard.orderFilterDispatched} (${orders.filter((o) => o.status === "Dispatched").length})`,
+                    },
+                    {
+                      id: "Delivered",
+                      label: `${t.adminDashboard.orderFilterDelivered} (${orders.filter((o) => o.status === "Delivered").length})`,
+                    },
+                    {
+                      id: "Cancelled",
+                      label: `${t.adminDashboard.orderFilterCancelled} (${orders.filter((o) => o.status === "Cancelled").length})`,
+                    },
+                  ].map((filter) => (
+                    <button
+                      key={filter.id}
+                      onClick={() => setAdminOrderFilter(filter.id as any)}
+                      className={`px-3 py-1 text-[8px] font-sans tracking-[0.2em] uppercase border transition-colors ${
+                        adminOrderFilter === filter.id
+                          ? "border-gold bg-gold/15 text-gold font-semibold"
+                          : "border-white/10 text-white/40 hover:text-white"
+                      }`}
+                    >
+                      {filter.label}
+                    </button>
+                  ))}
+                </div>
+
+                <span className="font-sans text-[9px] text-white/40 uppercase tracking-widest">
+                  {t.adminDashboard.orderSectionTitle}
+                </span>
+              </div>
+
+              {/* Status Update Notification Toast */}
+              <AnimatePresence>
+                {orderNotification && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    className="p-3 bg-emerald-500/10 border border-emerald-400/40 text-emerald-300 text-xs font-sans flex items-center gap-2 rounded-sm"
+                  >
+                    <CheckCircle2 size={14} className="text-emerald-400" />
+                    <span>{orderNotification}</span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {filteredAdminOrders.length === 0 ? (
+                <div className="text-center py-16 border border-gold/15 bg-black/40">
+                  <Package className="w-10 h-10 text-gold/40 mx-auto mb-3" />
+                  <p className="font-serif text-lg text-white/70">{t.adminDashboard.orderNoItems}</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {filteredAdminOrders.map((order) => {
+                    const isProcessing = order.status === "Processing";
+                    const isDispatched = order.status === "Dispatched";
+                    const isDelivered = order.status === "Delivered";
+                    const isCancelled = order.status === "Cancelled";
+
+                    return (
+                      <div
+                        key={order.id}
+                        className="border border-gold/25 bg-[#0a0a0a] p-5 sm:p-6 rounded-sm shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all"
+                      >
+                        {/* Order Header */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4 mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-gold/10 border border-gold/30 rounded-sm flex items-center justify-center shrink-0">
+                              <Package size={18} className="text-gold" />
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono text-xs font-semibold text-gold tracking-wider">
+                                  #{order.id}
+                                </span>
+                                <span className="text-white/20">•</span>
+                                <span className="font-sans text-[8px] text-white/40 uppercase tracking-widest">
+                                  {order.date}
+                                </span>
+                              </div>
+                              <h4 className="font-serif text-base text-white tracking-wide mt-0.5">
+                                {order.item}
+                              </h4>
+                              <p className="font-sans text-xs text-white/50">{order.subtitle}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-4 self-end sm:self-center">
+                            <span className="font-serif text-lg text-gold font-medium">
+                              {order.price}
+                            </span>
+                            <span
+                              className={`px-3 py-1 rounded-full text-[8px] font-sans tracking-[0.2em] uppercase border font-semibold inline-flex items-center gap-1.5 ${
+                                isDelivered
+                                  ? "border-emerald-400/50 bg-emerald-500/10 text-emerald-300"
+                                  : isDispatched
+                                  ? "border-sky-400/50 bg-sky-500/10 text-sky-300"
+                                  : isProcessing
+                                  ? "border-amber-400/50 bg-amber-500/10 text-amber-300"
+                                  : "border-rose-400/50 bg-rose-500/10 text-rose-300"
+                              }`}
+                            >
+                              <span
+                                className={`w-1.5 h-1.5 rounded-full ${
+                                  isProcessing
+                                    ? "bg-amber-400 animate-pulse"
+                                    : isDispatched
+                                    ? "bg-sky-400 animate-pulse"
+                                    : isDelivered
+                                    ? "bg-emerald-400"
+                                    : "bg-rose-400"
+                                }`}
+                              />
+                              {order.status}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Customer & Delivery Information */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 bg-white/[0.015] p-3.5 border border-white/5 text-xs font-sans">
+                          <div>
+                            <span className="font-sans text-[7.5px] uppercase tracking-[0.25em] text-gold/80 block mb-1">
+                              CLIENT CREDENTIALS
+                            </span>
+                            <p className="text-white font-medium">{order.customerName}</p>
+                            <p className="text-white/60 font-mono text-[11px]">{order.customerEmail}</p>
+                            {order.customerPhone && (
+                              <p className="text-white/40 text-[10px] mt-0.5">{order.customerPhone}</p>
+                            )}
+                          </div>
+
+                          <div>
+                            <span className="font-sans text-[7.5px] uppercase tracking-[0.25em] text-gold/80 block mb-1">
+                              SHIPPING DESTINATION & TRACKING
+                            </span>
+                            <p className="text-white/80 line-clamp-2">
+                              {order.shippingAddress || "Private Courier Allocation"}
+                            </p>
+                            {order.trackingNumber && (
+                              <div className="flex items-center gap-1.5 mt-1.5 text-sky-300 font-mono text-[10px]">
+                                <Truck size={12} />
+                                <span>Tracking: {order.trackingNumber}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Admin Status Update Actions */}
+                        <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-white/5">
+                          <span className="font-sans text-[8px] uppercase tracking-[0.25em] text-white/40">
+                            {t.adminDashboard.orderColAction}:
+                          </span>
+
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <button
+                              type="button"
+                              disabled={isProcessing || updatingOrderId === order.id}
+                              onClick={() => handleUpdateOrderStatus(order.id, "Processing")}
+                              className={`px-3 py-1.5 font-sans text-[7.5px] tracking-wider uppercase border transition-all ${
+                                isProcessing
+                                  ? "border-amber-400/30 bg-amber-500/10 text-amber-300/40 cursor-not-allowed"
+                                  : "border-amber-400/50 text-amber-300 hover:bg-amber-400/15 cursor-pointer"
+                              }`}
+                            >
+                              {t.adminDashboard.orderActionProcessing}
+                            </button>
+
+                            <button
+                              type="button"
+                              disabled={isDispatched || updatingOrderId === order.id}
+                              onClick={() => handleUpdateOrderStatus(order.id, "Dispatched")}
+                              className={`px-3 py-1.5 font-sans text-[7.5px] tracking-wider uppercase border transition-all ${
+                                isDispatched
+                                  ? "border-sky-400/30 bg-sky-500/10 text-sky-300/40 cursor-not-allowed"
+                                  : "border-sky-400/50 text-sky-300 hover:bg-sky-400/15 cursor-pointer"
+                              }`}
+                            >
+                              {t.adminDashboard.orderActionDispatched}
+                            </button>
+
+                            <button
+                              type="button"
+                              disabled={isDelivered || updatingOrderId === order.id}
+                              onClick={() => handleUpdateOrderStatus(order.id, "Delivered")}
+                              className={`px-3 py-1.5 font-sans text-[7.5px] tracking-wider uppercase border transition-all ${
+                                isDelivered
+                                  ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-300/40 cursor-not-allowed"
+                                  : "border-emerald-400/50 text-emerald-300 hover:bg-emerald-400/15 cursor-pointer"
+                              }`}
+                            >
+                              {t.adminDashboard.orderActionDelivered}
+                            </button>
+
+                            <button
+                              type="button"
+                              disabled={isCancelled || updatingOrderId === order.id}
+                              onClick={() => handleUpdateOrderStatus(order.id, "Cancelled")}
+                              className={`px-3 py-1.5 font-sans text-[7.5px] tracking-wider uppercase border transition-all ${
+                                isCancelled
+                                  ? "border-rose-400/30 bg-rose-500/10 text-rose-300/40 cursor-not-allowed"
+                                  : "border-rose-400/50 text-rose-300 hover:bg-rose-400/15 cursor-pointer"
+                              }`}
+                            >
+                              {t.adminDashboard.orderActionCancel}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* SUB-TAB 3: CLIENT DIRECT QUERIES & ADMIN REPLY SYSTEM */}
           {adminSubTab === "queries" && (
             <div className="space-y-6">
               {/* Filter Pills */}
@@ -636,7 +889,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* SUB-TAB 3: COLLECTION OVERSIGHT */}
+          {/* SUB-TAB 4: COLLECTION OVERSIGHT */}
           {adminSubTab === "inventory" && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {collection.map((chapter) => (
@@ -676,7 +929,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* SUB-TAB 4: SALON METRICS */}
+          {/* SUB-TAB 5: SALON METRICS */}
           {adminSubTab === "metrics" && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="p-6 border border-gold/20 bg-black/40">
@@ -976,45 +1229,73 @@ export default function LoginPage() {
                 </div>
               ) : (
                 <div className="divide-y divide-white/10">
-                  {orderHistory.map((order) => (
-                    <div
-                      key={order.id}
-                      className="py-4.5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/[0.015] px-2 transition-colors"
-                    >
-                      <div className="flex items-start gap-4">
-                        <div className="w-12 h-12 bg-gold/10 border border-gold/30 rounded-sm flex items-center justify-center shrink-0">
-                          <Package size={20} className="text-gold" />
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h4 className="font-serif text-base text-white tracking-wide">
-                              {order.item}
-                            </h4>
-                            <span className="font-mono text-[9px] text-white/40">#{order.id}</span>
-                          </div>
-                          <p className="font-sans text-xs text-white/60">{order.subtitle}</p>
-                          <p className="font-sans text-[9px] text-white/40 uppercase tracking-wider mt-1">
-                            {order.date}
-                          </p>
-                        </div>
-                      </div>
+                  {orderHistory.map((order) => {
+                    const isProcessing = order.status === "Processing";
+                    const isDispatched = order.status === "Dispatched";
+                    const isDelivered = order.status === "Delivered";
 
-                      <div className="flex items-center justify-between sm:justify-end gap-6 self-end sm:self-center">
-                        <span className="font-serif text-base text-gold font-medium">
-                          {order.price}
-                        </span>
-                        <span
-                          className={`px-3 py-1 rounded-full text-[8px] font-sans tracking-[0.2em] uppercase border font-semibold ${
-                            order.status === "Delivered"
-                              ? "border-emerald-400/40 bg-emerald-500/10 text-emerald-300"
-                              : "border-sky-400/40 bg-sky-500/10 text-sky-300"
-                          }`}
-                        >
-                          {order.status}
-                        </span>
+                    return (
+                      <div
+                        key={order.id}
+                        className="py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/[0.015] px-2 transition-colors"
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="w-12 h-12 bg-gold/10 border border-gold/30 rounded-sm flex items-center justify-center shrink-0">
+                            <Package size={20} className="text-gold" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-serif text-base text-white tracking-wide">
+                                {order.item}
+                              </h4>
+                              <span className="font-mono text-[9px] text-white/40">#{order.id}</span>
+                            </div>
+                            <p className="font-sans text-xs text-white/60">{order.subtitle}</p>
+                            <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                              <span className="font-sans text-[9px] text-white/40 uppercase tracking-wider">
+                                {order.date}
+                              </span>
+                              {order.trackingNumber && (
+                                <span className="text-sky-300 font-mono text-[10px] flex items-center gap-1">
+                                  <Truck size={11} /> {order.trackingNumber}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between sm:justify-end gap-6 self-end sm:self-center">
+                          <span className="font-serif text-base text-gold font-medium">
+                            {order.price}
+                          </span>
+                          <span
+                            className={`px-3 py-1 rounded-full text-[8px] font-sans tracking-[0.2em] uppercase border font-semibold flex items-center gap-1.5 ${
+                              isDelivered
+                                ? "border-emerald-400/40 bg-emerald-500/10 text-emerald-300"
+                                : isDispatched
+                                ? "border-sky-400/40 bg-sky-500/10 text-sky-300"
+                                : isProcessing
+                                ? "border-amber-400/40 bg-amber-500/10 text-amber-300"
+                                : "border-rose-400/40 bg-rose-500/10 text-rose-300"
+                            }`}
+                          >
+                            <span
+                              className={`w-1.5 h-1.5 rounded-full ${
+                                isProcessing
+                                  ? "bg-amber-400 animate-pulse"
+                                  : isDispatched
+                                  ? "bg-sky-400 animate-pulse"
+                                  : isDelivered
+                                  ? "bg-emerald-400"
+                                  : "bg-rose-400"
+                              }`}
+                            />
+                            {order.status}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

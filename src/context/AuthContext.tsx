@@ -40,11 +40,18 @@ export interface Query {
 
 export interface OrderItem {
   id: string;
+  customerId: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string;
+  shippingAddress?: string;
   item: string;
   subtitle: string;
   date: string;
-  status: "Delivered" | "Processing" | "Shipped" | "Cancelled";
+  status: "Processing" | "Dispatched" | "Delivered" | "Cancelled";
   price: string;
+  trackingNumber?: string;
+  updatedAt?: string;
 }
 
 const DEFAULT_ENQUIRIES: AtelierEnquiry[] = [
@@ -131,30 +138,80 @@ const DEFAULT_QUERIES: Query[] = [
   },
 ];
 
-const MOCK_ORDERS: OrderItem[] = [
+const DEFAULT_ORDERS: OrderItem[] = [
   {
-    id: "ord-001",
+    id: "ORD-7821",
+    customerId: "usr-client-01",
+    customerName: "Lady Vivienne Laurent",
+    customerEmail: "vivienne@aurelle.com",
+    customerPhone: "+33 6 12 34 56 78",
+    shippingAddress: "14 Rue du Faubourg Saint-Honoré, 75008 Paris, France",
     item: "THE SPOTLIGHT",
-    subtitle: "Emerald Column Gown · Size 36 FR",
-    date: "Oct 15, 2026",
-    status: "Delivered",
+    subtitle: "Emerald Column Gown · Size 36 FR · Custom Taper",
+    date: "Nov 3, 2026",
+    status: "Processing",
     price: "€4,850",
+    trackingNumber: "AUR-FR-98234-PAR",
+    updatedAt: "Nov 3, 2026",
   },
   {
-    id: "ord-002",
+    id: "ORD-7820",
+    customerId: "usr-client-02",
+    customerName: "Contessa Beatrice Moretti",
+    customerEmail: "beatrice@moretti.it",
+    customerPhone: "+39 02 8765 4321",
+    shippingAddress: "Via Montenapoleone 8, 20121 Milano, Italy",
+    item: "THE PRELUDE",
+    subtitle: "Velvet Cocktail Midi · Size 38 FR · Extended Hem",
+    date: "Nov 2, 2026",
+    status: "Dispatched",
+    price: "€2,750",
+    trackingNumber: "DHL-EX-492019-MIL",
+    updatedAt: "Nov 2, 2026",
+  },
+  {
+    id: "ORD-7819",
+    customerId: "usr-client-03",
+    customerName: "Zara Al-Mansoor",
+    customerEmail: "zara@almansoor.ae",
+    customerPhone: "+971 50 123 4567",
+    shippingAddress: "Villa 42, Emirates Hills Sector E, Dubai, UAE",
     item: "THE FLAPPER",
-    subtitle: "Beaded Fringe Cocktail · Size S",
-    date: "Sep 28, 2026",
+    subtitle: "Beaded Fringe Cocktail · Size S · Gold Silk Thread",
+    date: "Oct 28, 2026",
     status: "Delivered",
     price: "€3,200",
+    trackingNumber: "FDX-INT-88329-DXB",
+    updatedAt: "Nov 1, 2026",
   },
   {
-    id: "ord-003",
-    item: "THE PRELUDE",
-    subtitle: "Velvet Cocktail Midi · Size 38 FR",
-    date: "Nov 1, 2026",
-    status: "Processing",
-    price: "€2,750",
+    id: "ORD-7818",
+    customerId: "usr-client-04",
+    customerName: "Dr. Aris Thorne",
+    customerEmail: "aris.thorne@artbasel.com",
+    customerPhone: "+1 (305) 555-0199",
+    shippingAddress: "Star Island Dr, Miami Beach, FL 33139, USA",
+    item: "THE AFTERGLOW",
+    subtitle: "Silver Lamé Jumpsuit · Size M",
+    date: "Oct 25, 2026",
+    status: "Delivered",
+    price: "€3,600",
+    trackingNumber: "UPS-SV-10294-MIA",
+    updatedAt: "Oct 29, 2026",
+  },
+  {
+    id: "ORD-7817",
+    customerId: "usr-client-05",
+    customerName: "Evelyn Vance",
+    customerEmail: "evelyn@vance.co.uk",
+    customerPhone: "+44 20 7946 0912",
+    shippingAddress: "Kensington Palace Gardens, London W8 4QQ, UK",
+    item: "MIDNIGHT REBEL",
+    subtitle: "Asymmetric Satin Mini · Size 34 FR",
+    date: "Oct 20, 2026",
+    status: "Cancelled",
+    price: "€2,450",
+    updatedAt: "Oct 21, 2026",
   },
 ];
 
@@ -176,7 +233,9 @@ interface AuthContextType {
   queries: Query[];
   addQuery: (subject: string, message: string) => void;
   replyToQuery: (id: string, replyText: string) => void;
+  orders: OrderItem[];
   orderHistory: OrderItem[];
+  updateOrderStatus: (id: string, status: OrderItem["status"]) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -191,13 +250,16 @@ const AuthContext = createContext<AuthContextType>({
   queries: DEFAULT_QUERIES,
   addQuery: () => {},
   replyToQuery: () => {},
-  orderHistory: MOCK_ORDERS,
+  orders: DEFAULT_ORDERS,
+  orderHistory: DEFAULT_ORDERS,
+  updateOrderStatus: () => {},
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [enquiries, setEnquiries] = useState<AtelierEnquiry[]>(DEFAULT_ENQUIRIES);
   const [queries, setQueries] = useState<Query[]>(DEFAULT_QUERIES);
+  const [orders, setOrders] = useState<OrderItem[]>(DEFAULT_ORDERS);
 
   // Restore stored session and data
   useEffect(() => {
@@ -213,6 +275,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const storedQueries = localStorage.getItem("aurelle_queries");
       if (storedQueries) {
         setQueries(JSON.parse(storedQueries));
+      }
+      const storedOrders = localStorage.getItem("aurelle_orders");
+      if (storedOrders) {
+        setOrders(JSON.parse(storedOrders));
       }
     } catch {
       // localStorage may fail in some environments
@@ -388,6 +454,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateOrderStatus = (id: string, status: OrderItem["status"]) => {
+    const updated = orders.map((o) =>
+      o.id === id
+        ? {
+            ...o,
+            status,
+            updatedAt: new Date().toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            }),
+          }
+        : o
+    );
+    setOrders(updated);
+    try {
+      localStorage.setItem("aurelle_orders", JSON.stringify(updated));
+    } catch {
+      // ignore
+    }
+  };
+
+  // Client's order history: user's specific orders, or curated atelier allocations
+  const userOrderHistory = user
+    ? orders.filter(
+        (o) =>
+          o.customerId === user.id ||
+          o.customerEmail.toLowerCase() === user.email.toLowerCase()
+      )
+    : [];
+
+  const effectiveOrderHistory =
+    userOrderHistory.length > 0 ? userOrderHistory : orders.slice(0, 3);
+
   return (
     <AuthContext.Provider
       value={{
@@ -402,7 +502,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         queries,
         addQuery,
         replyToQuery,
-        orderHistory: MOCK_ORDERS,
+        orders,
+        orderHistory: effectiveOrderHistory,
+        updateOrderStatus,
       }}
     >
       {children}
