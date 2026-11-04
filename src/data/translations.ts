@@ -327,6 +327,7 @@ export const translations = {
       orderNoItems: "No customer orders matching this filter.",
       orderTotalKpi: "Active Orders",
       orderRevenueKpi: "Order Volume",
+      tabRevenue: "REVENUE & FINANCIALS",
     },
     profile: {
       tabProfile: "PROFILE",
@@ -688,6 +689,7 @@ export const translations = {
       orderNoItems: "Aucune commande client ne correspond à ce filtre.",
       orderTotalKpi: "Commandes Actives",
       orderRevenueKpi: "Volume des Commandes",
+      tabRevenue: "REVENUS & FINANCES",
     },
     profile: {
       tabProfile: "PROFIL",
@@ -1049,6 +1051,7 @@ export const translations = {
       orderNoItems: "Nessun ordine cliente corrispondente a questo filtro.",
       orderTotalKpi: "Ordini Attivi",
       orderRevenueKpi: "Volume degli Ordini",
+      tabRevenue: "RICAVI & ANALITICA",
     },
     profile: {
       tabProfile: "PROFILO",
@@ -1410,6 +1413,7 @@ export const translations = {
       orderNoItems: "No se encontraron pedidos con este filtro.",
       orderTotalKpi: "Pedidos Activos",
       orderRevenueKpi: "Volumen de Pedidos",
+      tabRevenue: "INGRESOS & FINANZAS",
     },
     profile: {
       tabProfile: "PERFIL",
@@ -1771,6 +1775,7 @@ export const translations = {
       orderNoItems: "Keine Bestellungen mit diesem Status vorhanden.",
       orderTotalKpi: "Aktive Bestellungen",
       orderRevenueKpi: "Bestellvolumen",
+      tabRevenue: "UMSATZ & ANALYTIK",
     },
     profile: {
       tabProfile: "PROFIL",

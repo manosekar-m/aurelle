@@ -31,10 +31,39 @@ import {
   HelpCircle,
   Truck,
   RotateCcw,
+  TrendingUp,
+  BarChart3,
+  ArrowUpRight,
+  Activity,
+  DollarSign,
+  Layers,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { collection } from "@/data/collection";
+
+interface RevenuePoint {
+  month: string;
+  short: string;
+  revenue: number;
+  ordersCount: number;
+  topGarment: string;
+  change: string;
+}
+
+const REVENUE_HISTORY: RevenuePoint[] = [
+  { month: "January", short: "Jan", revenue: 8400, ordersCount: 2, topGarment: "THE PRELUDE", change: "+12%" },
+  { month: "February", short: "Feb", revenue: 11200, ordersCount: 3, topGarment: "THE SPOTLIGHT", change: "+18%" },
+  { month: "March", short: "Mar", revenue: 14600, ordersCount: 4, topGarment: "THE FLAPPER", change: "+24%" },
+  { month: "April", short: "Apr", revenue: 9800, ordersCount: 3, topGarment: "THE PRELUDE", change: "-8%" },
+  { month: "May", short: "May", revenue: 16500, ordersCount: 5, topGarment: "THE SPOTLIGHT", change: "+32%" },
+  { month: "June", short: "Jun", revenue: 19200, ordersCount: 6, topGarment: "THE AFTERGLOW", change: "+16%" },
+  { month: "July", short: "Jul", revenue: 15400, ordersCount: 4, topGarment: "THE FLAPPER", change: "+8%" },
+  { month: "August", short: "Aug", revenue: 12100, ordersCount: 3, topGarment: "THE PRELUDE", change: "+10%" },
+  { month: "September", short: "Sep", revenue: 22800, ordersCount: 7, topGarment: "THE SPOTLIGHT", change: "+45%" },
+  { month: "October", short: "Oct", revenue: 28600, ordersCount: 8, topGarment: "THE SPOTLIGHT", change: "+26%" },
+  { month: "November", short: "Nov", revenue: 42800, ordersCount: 11, topGarment: "THE SPOTLIGHT", change: "+50%" },
+];
 
 export default function LoginPage() {
   const router = useRouter();
@@ -57,10 +86,13 @@ export default function LoginPage() {
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
 
   const [activeTab, setActiveTab] = useState<"login" | "signup" | "admin">("login");
-  const [adminSubTab, setAdminSubTab] = useState<"enquiries" | "orders" | "queries" | "inventory" | "metrics">("enquiries");
+  const [adminSubTab, setAdminSubTab] = useState<"revenue" | "orders" | "enquiries" | "queries" | "inventory" | "metrics">("revenue");
   const [enquiryFilter, setEnquiryFilter] = useState<"all" | "New" | "Fitting Scheduled" | "Completed">("all");
   const [adminOrderFilter, setAdminOrderFilter] = useState<"all" | "Processing" | "Dispatched" | "Delivered" | "Cancelled">("all");
   const [adminQueryFilter, setAdminQueryFilter] = useState<"all" | "Open" | "Replied">("all");
+
+  const [hoveredMonthIndex, setHoveredMonthIndex] = useState<number>(REVENUE_HISTORY.length - 1);
+  const [revenueTimeframe, setRevenueTimeframe] = useState<"full" | "h2">("full");
 
   const [orderNotification, setOrderNotification] = useState<string | null>(null);
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
@@ -217,6 +249,10 @@ export default function LoginPage() {
       )
     : [];
 
+  const activeRevenueData = revenueTimeframe === "h2" ? REVENUE_HISTORY.slice(5) : REVENUE_HISTORY;
+  const currentMonthData = activeRevenueData[hoveredMonthIndex] || activeRevenueData[activeRevenueData.length - 1];
+  const totalGrossRevenue = activeRevenueData.reduce((acc, curr) => acc + curr.revenue, 0);
+
   const renderLanguageSelector = () => (
     <div className="relative">
       <button
@@ -278,33 +314,75 @@ export default function LoginPage() {
   // VIEW 1: ADMIN ATELIER COMMAND DASHBOARD
   // ==========================================
   if (user && user.role === "admin") {
-    return (
-      <main className="min-h-screen bg-[#050505] text-ivory pt-24 pb-20 px-4 sm:px-8 lg:px-16 relative overflow-hidden">
-        {/* Subtle gold ambient glow */}
-        <div className="absolute top-10 right-1/4 w-[600px] h-[600px] bg-gold/10 blur-[160px] pointer-events-none" />
+    // Calculate SVG curve coordinates for revenue chart
+    const chartWidth = 780;
+    const chartHeight = 220;
+    const paddingX = 40;
+    const maxRev = 48000;
+    const points = activeRevenueData.map((d, i) => {
+      const x = paddingX + (i / (activeRevenueData.length - 1)) * (chartWidth - paddingX * 2);
+      const y = chartHeight - (d.revenue / maxRev) * (chartHeight - 40) - 20;
+      return { x, y, ...d };
+    });
 
-        <div className="max-w-7xl mx-auto">
-          {/* Top Back / Director Bar */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gold/20 pb-6 mb-8">
+    // Create smooth SVG cubic bezier path
+    let pathD = `M ${points[0].x} ${points[0].y}`;
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i];
+      const p1 = points[i + 1];
+      const mx = (p0.x + p1.x) / 2;
+      pathD += ` C ${mx} ${p0.y}, ${mx} ${p1.y}, ${p1.x} ${p1.y}`;
+    }
+    const areaPathD = `${pathD} L ${points[points.length - 1].x} ${chartHeight} L ${points[0].x} ${chartHeight} Z`;
+
+    return (
+      <main className="min-h-screen bg-[#040404] text-ivory pt-24 pb-20 px-4 sm:px-8 lg:px-16 relative overflow-hidden">
+        {/* Dynamic ambient gold background aura */}
+        <div className="absolute top-10 right-1/4 w-[750px] h-[750px] bg-gold/10 blur-[180px] pointer-events-none" />
+        <div className="absolute top-2/3 left-1/4 w-[500px] h-[500px] bg-champagne/5 blur-[160px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          {/* Executive Telemetry & Global Salon Strip */}
+          <div className="mb-6 p-2.5 bg-black/60 border border-gold/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-[8px] font-sans tracking-widest uppercase">
             <div className="flex items-center gap-3">
+              <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                LIVE ATELIER NODE · ONLINE
+              </span>
+              <span className="text-white/20">|</span>
+              <span className="text-white/50">PARIS · MILAN · DUBAI · NYC · ZÜRICH</span>
+            </div>
+            <div className="flex items-center gap-4 text-gold/80 flex-wrap">
+              <span>SALON LOCAL TIME:</span>
+              <span className="text-white/80">PARIS <strong className="text-white">10:45 CET</strong></span>
+              <span className="text-white/80">DUBAI <strong className="text-white">13:45 GST</strong></span>
+              <span className="text-white/80">NYC <strong className="text-white">04:45 EST</strong></span>
+            </div>
+          </div>
+
+          {/* Top Director Bar */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gold/20 pb-6 mb-8">
+            <div className="flex items-center gap-4">
               <Link
                 href="/"
-                className="p-2 border border-gold/30 hover:border-gold rounded-full text-gold transition-colors flex items-center justify-center"
+                className="p-2.5 border border-gold/40 hover:border-gold hover:bg-gold/10 rounded-full text-gold transition-colors flex items-center justify-center shadow-[0_0_15px_rgba(197,160,89,0.2)]"
                 title="Return to Boutique"
               >
                 <ArrowLeft size={16} />
               </Link>
               <div>
                 <div className="flex items-center gap-2">
-                  <Crown size={15} className="text-gold" />
+                  <Crown size={16} className="text-gold" />
                   <span className="font-sans text-[9px] tracking-[0.35em] uppercase text-gold font-semibold">
                     {t.adminDashboard.title}
                   </span>
                 </div>
-                <h1 className="font-serif text-2xl sm:text-3xl text-ivory tracking-wider mt-0.5">
+                <h1 className="font-serif text-3xl sm:text-4xl text-ivory tracking-wider mt-0.5">
                   {t.adminDashboard.directorTitle}
                 </h1>
-                <p className="font-sans text-xs text-white/50">{t.adminDashboard.welcome}</p>
+                <p className="font-sans text-xs text-white/50 font-light mt-0.5">
+                  {t.adminDashboard.welcome} · Executive Suite
+                </p>
               </div>
             </div>
 
@@ -326,179 +404,437 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* KPI Metrics Row */}
+          {/* Luxury Executive KPI Strip */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {[
               {
-                label: t.adminDashboard.totalEnquiries,
-                value: enquiries.length.toString(),
-                sub: t.adminDashboard.kpiActiveSeason,
+                label: "GROSS ATELIER REVENUE",
+                value: `€${totalGrossRevenue.toLocaleString()}`,
+                sub: "+28.4% YoY Gala Growth",
+                trend: true,
+                icon: DollarSign,
               },
               {
                 label: t.adminDashboard.tabOrders,
-                value: orders.length.toString(),
-                sub: `${orders.filter((o) => o.status === "Processing" || o.status === "Dispatched").length} Active Fulfillments`,
+                value: `${orders.length} Active Orders`,
+                sub: "96% Scheduled Delivery",
+                trend: true,
+                icon: Package,
               },
               {
-                label: t.adminDashboard.tabClientQueries || "Client Queries",
-                value: queries.length.toString(),
-                sub: `${queries.filter((q) => q.status === "Open").length} Awaiting Reply`,
+                label: t.adminDashboard.tabClientQueries,
+                value: `${queries.length} Inquiries`,
+                sub: `${queries.filter((q) => q.status === "Open").length} Awaiting Director Reply`,
+                trend: false,
+                icon: MessageSquare,
               },
               {
                 label: t.adminDashboard.coutureConversion,
-                value: "96%",
-                sub: t.adminDashboard.kpiConversion,
+                value: "96.4%",
+                sub: "Consultation to Haute Order",
+                trend: true,
+                icon: TrendingUp,
               },
-            ].map((kpi, idx) => (
-              <div
-                key={idx}
-                className="p-5 border border-gold/20 bg-black/40 rounded-sm relative overflow-hidden"
-              >
-                <div className="h-0.5 w-8 bg-gold mb-3" />
-                <p className="font-sans text-[8px] tracking-[0.25em] uppercase text-white/50 mb-1">
-                  {kpi.label}
-                </p>
-                <p className="font-serif text-3xl sm:text-4xl text-white font-medium mb-1">
-                  {kpi.value}
-                </p>
-                <p className="font-sans text-[8px] text-gold/80 tracking-wide">{kpi.sub}</p>
-              </div>
-            ))}
+            ].map((kpi, idx) => {
+              const Icon = kpi.icon;
+              return (
+                <div
+                  key={idx}
+                  className="p-5 border border-gold/25 bg-[#0a0a0a]/90 backdrop-blur-md rounded-sm relative overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.6)] group hover:border-gold/50 transition-colors"
+                >
+                  <div className="absolute top-0 right-0 p-3 opacity-20 text-gold group-hover:opacity-40 transition-opacity">
+                    <Icon size={28} />
+                  </div>
+                  <div className="h-0.5 w-10 bg-gradient-to-r from-gold to-champagne mb-3" />
+                  <p className="font-sans text-[8px] tracking-[0.25em] uppercase text-white/50 mb-1">
+                    {kpi.label}
+                  </p>
+                  <p className="font-serif text-2xl sm:text-3xl text-white font-medium mb-1 tracking-wide">
+                    {kpi.value}
+                  </p>
+                  <div className="flex items-center gap-1.5">
+                    {kpi.trend && (
+                      <span className="inline-flex items-center text-emerald-400 text-[8px] font-sans font-semibold">
+                        <ArrowUpRight size={10} />
+                      </span>
+                    )}
+                    <span className="font-sans text-[8px] text-gold/90 tracking-wide">{kpi.sub}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           {/* Admin Navigation Tabs */}
-          <div className="flex border-b border-gold/20 mb-6 gap-2 sm:gap-4 overflow-x-auto">
+          <div className="flex border-b border-gold/20 mb-8 gap-2 sm:gap-4 overflow-x-auto">
             {[
-              { id: "enquiries", label: t.adminDashboard.tabEnquiries },
-              { id: "orders", label: `${t.adminDashboard.tabOrders} (${orders.length})` },
-              { id: "queries", label: `${t.adminDashboard.tabClientQueries} (${queries.length})` },
-              { id: "inventory", label: t.adminDashboard.tabInventory },
-              { id: "metrics", label: t.adminDashboard.tabMetrics },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setAdminSubTab(tab.id as any)}
-                className={`py-3 px-4 font-sans text-[9px] tracking-[0.3em] uppercase transition-all relative whitespace-nowrap ${
-                  adminSubTab === tab.id ? "text-gold font-semibold" : "text-white/40 hover:text-white"
-                }`}
-              >
-                {tab.label}
-                {adminSubTab === tab.id && (
-                  <motion.div
-                    layoutId="admin-tab-line"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-gold"
-                  />
-                )}
-              </button>
-            ))}
+              { id: "revenue", label: t.adminDashboard.tabRevenue || "REVENUE & FINANCIALS", icon: BarChart3 },
+              { id: "orders", label: `${t.adminDashboard.tabOrders} (${orders.length})`, icon: Package },
+              { id: "enquiries", label: `${t.adminDashboard.tabEnquiries} (${enquiries.length})`, icon: Calendar },
+              { id: "queries", label: `${t.adminDashboard.tabClientQueries} (${queries.length})`, icon: MessageSquare },
+              { id: "inventory", label: t.adminDashboard.tabInventory, icon: Layers },
+              { id: "metrics", label: t.adminDashboard.tabMetrics, icon: Activity },
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = adminSubTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setAdminSubTab(tab.id as any)}
+                  className={`py-3.5 px-4 font-sans text-[9px] tracking-[0.25em] uppercase transition-all relative flex items-center gap-2 whitespace-nowrap ${
+                    isActive ? "text-gold font-semibold" : "text-white/40 hover:text-white"
+                  }`}
+                >
+                  <Icon size={12} className={isActive ? "text-gold" : "text-white/30"} />
+                  <span>{tab.label}</span>
+                  {isActive && (
+                    <motion.div
+                      layoutId="admin-tab-line"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-gold via-champagne to-gold"
+                    />
+                  )}
+                </button>
+              );
+            })}
           </div>
 
-          {/* SUB-TAB 1: CLIENT ENQUIRIES LEDGER */}
-          {adminSubTab === "enquiries" && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 flex-wrap mb-4">
-                <span className="font-sans text-[8px] tracking-[0.25em] uppercase text-white/40 mr-2">
-                  {t.adminDashboard.statusFilter}
-                </span>
-                {[
-                  { id: "all", label: t.adminDashboard.filterAll },
-                  { id: "New", label: t.adminDashboard.filterNew },
-                  { id: "Fitting Scheduled", label: t.adminDashboard.filterFitting },
-                  { id: "Completed", label: t.adminDashboard.filterCompleted },
-                ].map((f) => (
-                  <button
-                    key={f.id}
-                    onClick={() => setEnquiryFilter(f.id as any)}
-                    className={`px-3 py-1 text-[8px] font-sans tracking-[0.2em] uppercase border transition-colors ${
-                      enquiryFilter === f.id
-                        ? "border-gold bg-gold/15 text-gold"
-                        : "border-white/10 text-white/40 hover:text-white"
-                    }`}
-                  >
-                    {f.label}
-                  </button>
-                ))}
+          {/* ======================================================== */}
+          {/* TAB 1: REVENUE HISTORY GRAPH & FINANCIAL INTELLIGENCE    */}
+          {/* ======================================================== */}
+          {adminSubTab === "revenue" && (
+            <div className="space-y-8">
+              {/* Main Revenue Chart Card */}
+              <div className="border border-gold/30 bg-[#0a0a0a]/95 backdrop-blur-xl p-6 sm:p-8 rounded-sm shadow-[0_25px_70px_rgba(0,0,0,0.85)] relative">
+                {/* Header controls */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-6 mb-6">
+                  <div>
+                    <div className="flex items-center gap-2 text-gold mb-1">
+                      <TrendingUp size={16} />
+                      <span className="font-sans text-[8px] tracking-[0.35em] uppercase font-semibold">
+                        HAUTE COUTURE FISCAL INTELLIGENCE
+                      </span>
+                    </div>
+                    <h2 className="font-serif text-2xl sm:text-3xl text-white tracking-wide">
+                      Maison Aurelle Revenue Trajectory
+                    </h2>
+                    <p className="font-sans text-xs text-white/50 mt-1">
+                      Aggregated private salon revenue, bespoke commissions, and VIP order velocity.
+                    </p>
+                  </div>
+
+                  {/* Timeframe switchers */}
+                  <div className="flex items-center gap-2 self-start sm:self-auto border border-gold/25 p-1 bg-black/60">
+                    <button
+                      onClick={() => {
+                        setRevenueTimeframe("full");
+                        setHoveredMonthIndex(REVENUE_HISTORY.length - 1);
+                      }}
+                      className={`px-3 py-1.5 font-sans text-[8px] tracking-[0.2em] uppercase transition-colors ${
+                        revenueTimeframe === "full"
+                          ? "bg-gold text-[#050505] font-semibold"
+                          : "text-white/50 hover:text-white"
+                      }`}
+                    >
+                      Fiscal Year 2026 (YTD)
+                    </button>
+                    <button
+                      onClick={() => {
+                        setRevenueTimeframe("h2");
+                        setHoveredMonthIndex(REVENUE_HISTORY.slice(5).length - 1);
+                      }}
+                      className={`px-3 py-1.5 font-sans text-[8px] tracking-[0.2em] uppercase transition-colors ${
+                        revenueTimeframe === "h2"
+                          ? "bg-gold text-[#050505] font-semibold"
+                          : "text-white/50 hover:text-white"
+                      }`}
+                    >
+                      Autumn / Winter Gala
+                    </button>
+                  </div>
+                </div>
+
+                {/* Interactive Tooltip Card for Active Month */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-white/[0.02] border border-gold/20 mb-6">
+                  <div>
+                    <span className="font-sans text-[7.5px] uppercase tracking-[0.25em] text-white/40 block mb-1">
+                      ACTIVE CYCLE
+                    </span>
+                    <span className="font-serif text-lg text-white font-medium">
+                      {currentMonthData.month} 2026
+                    </span>
+                  </div>
+                  <div>
+                    <span className="font-sans text-[7.5px] uppercase tracking-[0.25em] text-white/40 block mb-1">
+                      MONTHLY GROSS REVENUE
+                    </span>
+                    <span className="font-serif text-lg text-gold font-semibold">
+                      €{currentMonthData.revenue.toLocaleString()}
+                    </span>
+                    <span className="text-[9px] text-emerald-400 font-sans ml-1.5">
+                      {currentMonthData.change}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="font-sans text-[7.5px] uppercase tracking-[0.25em] text-white/40 block mb-1">
+                      COMMISSIONED LOOKS
+                    </span>
+                    <span className="font-serif text-lg text-white font-medium">
+                      {currentMonthData.ordersCount} Bespoke Orders
+                    </span>
+                  </div>
+                  <div>
+                    <span className="font-sans text-[7.5px] uppercase tracking-[0.25em] text-white/40 block mb-1">
+                      COLLECTION LEADER
+                    </span>
+                    <span className="font-sans text-xs text-gold/90 tracking-wider font-semibold">
+                      {currentMonthData.topGarment}
+                    </span>
+                  </div>
+                </div>
+
+                {/* SVG Revenue Graph Canvas */}
+                <div className="w-full overflow-x-auto pb-4">
+                  <div className="min-w-[680px]">
+                    <svg
+                      viewBox={`0 0 ${chartWidth} ${chartHeight + 40}`}
+                      className="w-full h-64 sm:h-72 overflow-visible"
+                    >
+                      <defs>
+                        <linearGradient id="goldGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#C5A059" stopOpacity="0.45" />
+                          <stop offset="60%" stopColor="#C5A059" stopOpacity="0.12" />
+                          <stop offset="100%" stopColor="#C5A059" stopOpacity="0" />
+                        </linearGradient>
+                        <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
+                          <feDropShadow dx="0" dy="0" stdDeviation="4" floodColor="#C5A059" floodOpacity="0.7" />
+                        </filter>
+                      </defs>
+
+                      {/* Horizontal Gridlines */}
+                      {[10000, 20000, 30000, 40000].map((level) => {
+                        const y = chartHeight - (level / maxRev) * (chartHeight - 40) - 20;
+                        return (
+                          <g key={level}>
+                            <line
+                              x1={paddingX}
+                              y1={y}
+                              x2={chartWidth - paddingX}
+                              y2={y}
+                              stroke="rgba(197, 160, 89, 0.15)"
+                              strokeDasharray="4 4"
+                            />
+                            <text
+                              x={paddingX - 10}
+                              y={y + 3}
+                              fill="rgba(255, 255, 255, 0.3)"
+                              fontSize="8"
+                              fontFamily="monospace"
+                              textAnchor="end"
+                            >
+                              €{(level / 1000).toFixed(0)}k
+                            </text>
+                          </g>
+                        );
+                      })}
+
+                      {/* Area Fill */}
+                      <path d={areaPathD} fill="url(#goldGradient)" />
+
+                      {/* Bar columns under each point */}
+                      {points.map((p, idx) => {
+                        const isHovered = hoveredMonthIndex === idx;
+                        const barWidth = 14;
+                        return (
+                          <rect
+                            key={`bar-${idx}`}
+                            x={p.x - barWidth / 2}
+                            y={p.y}
+                            width={barWidth}
+                            height={chartHeight - p.y}
+                            fill={isHovered ? "rgba(197, 160, 89, 0.4)" : "rgba(197, 160, 89, 0.08)"}
+                            className="transition-all duration-200 cursor-pointer"
+                            onClick={() => setHoveredMonthIndex(idx)}
+                            onMouseEnter={() => setHoveredMonthIndex(idx)}
+                          />
+                        );
+                      })}
+
+                      {/* Smooth Trend Spline */}
+                      <path
+                        d={pathD}
+                        fill="none"
+                        stroke="#C5A059"
+                        strokeWidth="2.5"
+                        filter="url(#goldGlow)"
+                      />
+
+                      {/* Data Point Dots & Labels */}
+                      {points.map((p, idx) => {
+                        const isHovered = hoveredMonthIndex === idx;
+                        return (
+                          <g
+                            key={idx}
+                            className="cursor-pointer"
+                            onClick={() => setHoveredMonthIndex(idx)}
+                            onMouseEnter={() => setHoveredMonthIndex(idx)}
+                          >
+                            {/* Hover guideline */}
+                            {isHovered && (
+                              <line
+                                x1={p.x}
+                                y1={20}
+                                x2={p.x}
+                                y2={chartHeight}
+                                stroke="rgba(197, 160, 89, 0.5)"
+                                strokeDasharray="3 3"
+                              />
+                            )}
+
+                            {/* Circle point */}
+                            <circle
+                              cx={p.x}
+                              cy={p.y}
+                              r={isHovered ? 6 : 4}
+                              fill={isHovered ? "#FFFFFF" : "#C5A059"}
+                              stroke="#050505"
+                              strokeWidth="2"
+                              className="transition-all duration-200"
+                            />
+
+                            {/* Month Label */}
+                            <text
+                              x={p.x}
+                              y={chartHeight + 18}
+                              fill={isHovered ? "#C5A059" : "rgba(255, 255, 255, 0.5)"}
+                              fontSize="9"
+                              fontFamily="sans-serif"
+                              fontWeight={isHovered ? "bold" : "normal"}
+                              textAnchor="middle"
+                              letterSpacing="0.1em"
+                            >
+                              {p.short.toUpperCase()}
+                            </text>
+                          </g>
+                        );
+                      })}
+                    </svg>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-[8px] font-sans tracking-widest uppercase text-white/40 pt-4 border-t border-white/5">
+                  <span>Hover or tap any month marker to inspect bespoke revenue analytics</span>
+                  <span className="text-gold font-medium">Audited Atelier Books · Fiscal 2026</span>
+                </div>
               </div>
 
-              <div className="border border-gold/20 bg-black/50 overflow-x-auto">
-                <table className="w-full text-left font-sans text-xs">
-                  <thead className="border-b border-gold/20 text-[8px] tracking-[0.3em] uppercase text-gold bg-white/[0.02]">
-                    <tr>
-                      <th className="py-3.5 px-4">{t.adminDashboard.colClient}</th>
-                      <th className="py-3.5 px-4">{t.adminDashboard.colContact}</th>
-                      <th className="py-3.5 px-4">{t.adminDashboard.colGarment}</th>
-                      <th className="py-3.5 px-4">{t.adminDashboard.colType}</th>
-                      <th className="py-3.5 px-4">{t.adminDashboard.colDetails}</th>
-                      <th className="py-3.5 px-4">{t.adminDashboard.colStatus}</th>
-                      <th className="py-3.5 px-4 text-right">{t.adminDashboard.colAction}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/10">
-                    {filteredEnquiries.map((enq) => (
-                      <tr key={enq.id} className="hover:bg-white/[0.02] transition-colors">
-                        <td className="py-4 px-4 font-serif text-sm text-white font-medium whitespace-nowrap">
-                          {enq.name}
-                          <span className="block font-sans text-[8px] text-white/40 font-normal tracking-wide">
-                            {enq.date}
-                          </span>
-                        </td>
-                        <td className="py-4 px-4 text-white/70 whitespace-nowrap text-xs font-mono">
-                          {enq.mobile}
-                        </td>
-                        <td className="py-4 px-4 whitespace-nowrap">
-                          <span className="text-gold font-medium text-[10px] tracking-wider block">
-                            {enq.lookTitle}
-                          </span>
-                          <span className="text-[8px] text-white/40 tracking-wider">
-                            {enq.lookSubtitle}
-                          </span>
-                        </td>
-                        <td className="py-4 px-4 text-white/60 text-[10px] tracking-wide whitespace-nowrap">
-                          {enq.enquiryType}
-                        </td>
-                        <td className="py-4 px-4 text-white/70 text-xs max-w-xs leading-relaxed">
-                          {enq.detail}
-                        </td>
-                        <td className="py-4 px-4 whitespace-nowrap">
-                          <span
-                            className={`px-2.5 py-1 text-[8px] font-sans tracking-[0.2em] uppercase rounded-full border ${
-                              enq.status === "New"
-                                ? "border-amber-400/40 bg-amber-500/10 text-amber-300"
-                                : enq.status === "Fitting Scheduled"
-                                ? "border-sky-400/40 bg-sky-500/10 text-sky-300"
-                                : "border-emerald-400/40 bg-emerald-500/10 text-emerald-300"
-                            }`}
-                          >
-                            {enq.status}
-                          </span>
-                        </td>
-                        <td className="py-4 px-4 text-right whitespace-nowrap space-x-2">
-                          {enq.status !== "Fitting Scheduled" && (
-                            <button
-                              onClick={() => updateEnquiryStatus(enq.id, "Fitting Scheduled")}
-                              className="px-2.5 py-1 text-[7px] font-sans tracking-[0.2em] uppercase border border-sky-400/40 text-sky-300 hover:bg-sky-400/10"
-                            >
-                              {t.adminDashboard.markFitting}
-                            </button>
-                          )}
-                          {enq.status !== "Completed" && (
-                            <button
-                              onClick={() => updateEnquiryStatus(enq.id, "Completed")}
-                              className="px-2.5 py-1 text-[7px] font-sans tracking-[0.2em] uppercase border border-emerald-400/40 text-emerald-300 hover:bg-emerald-400/10"
-                            >
-                              {t.adminDashboard.markComplete}
-                            </button>
-                          )}
-                        </td>
-                      </tr>
+              {/* Three Strategic Breakdown Panels */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* 1. Global Salon Distribution */}
+                <div className="border border-gold/25 bg-[#0a0a0a] p-6 rounded-sm">
+                  <div className="flex items-center justify-between border-b border-gold/15 pb-3 mb-5">
+                    <span className="font-sans text-[8px] tracking-[0.3em] uppercase text-gold font-semibold">
+                      SALON REVENUE DISTRIBUTION
+                    </span>
+                    <Globe size={12} className="text-gold" />
+                  </div>
+
+                  <div className="space-y-4">
+                    {[
+                      { city: "Paris (Flagship Atelier)", share: "38%", amount: "€76,532" },
+                      { city: "Milano (Fashion Suite)", share: "24%", amount: "€48,336" },
+                      { city: "Dubai (Emirates Salon)", share: "20%", amount: "€40,280" },
+                      { city: "New York (Private Client)", share: "12%", amount: "€24,168" },
+                      { city: "Zürich (High Jewelry Salon)", share: "6%", amount: "€12,084" },
+                    ].map((salon) => (
+                      <div key={salon.city} className="space-y-1">
+                        <div className="flex justify-between text-xs font-sans">
+                          <span className="text-white/80">{salon.city}</span>
+                          <span className="text-gold font-mono">{salon.amount}</span>
+                        </div>
+                        <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                          <div className="h-full bg-gradient-to-r from-gold to-champagne" style={{ width: salon.share }} />
+                        </div>
+                      </div>
                     ))}
-                  </tbody>
-                </table>
+                  </div>
+                </div>
+
+                {/* 2. Collection Dress Share */}
+                <div className="border border-gold/25 bg-[#0a0a0a] p-6 rounded-sm">
+                  <div className="flex items-center justify-between border-b border-gold/15 pb-3 mb-5">
+                    <span className="font-sans text-[8px] tracking-[0.3em] uppercase text-gold font-semibold">
+                      REVENUE BY BESPOKE CREATION
+                    </span>
+                    <Sparkles size={12} className="text-gold" />
+                  </div>
+
+                  <div className="space-y-4">
+                    {[
+                      { name: "THE SPOTLIGHT (Emerald Gown)", pct: "42%", total: "€84,588" },
+                      { name: "THE FLAPPER (Beaded Fringe)", pct: "26%", total: "€52,364" },
+                      { name: "THE PRELUDE (Velvet Midi)", pct: "18%", total: "€36,252" },
+                      { name: "THE AFTERGLOW (Silver Lamé)", pct: "10%", total: "€20,140" },
+                      { name: "MIDNIGHT REBEL (Asymmetric)", pct: "4%", total: "€8,056" },
+                    ].map((dress) => (
+                      <div key={dress.name} className="space-y-1">
+                        <div className="flex justify-between text-xs font-sans">
+                          <span className="text-white/80">{dress.name}</span>
+                          <span className="text-gold font-mono">{dress.total}</span>
+                        </div>
+                        <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                          <div className="h-full bg-gold" style={{ width: dress.pct }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 3. Executive Financial Metrics */}
+                <div className="border border-gold/25 bg-[#0a0a0a] p-6 rounded-sm flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between border-b border-gold/15 pb-3 mb-5">
+                      <span className="font-sans text-[8px] tracking-[0.3em] uppercase text-gold font-semibold">
+                        DIRECTORATE FINANCIAL BENCHMARKS
+                      </span>
+                      <Crown size={12} className="text-gold" />
+                    </div>
+
+                    <div className="space-y-4 font-sans text-xs">
+                      <div className="flex justify-between py-2 border-b border-white/5">
+                        <span className="text-white/50 uppercase text-[8px] tracking-wider">Average Commission (AOV)</span>
+                        <span className="text-white font-mono font-medium">€3,420</span>
+                      </div>
+                      <div className="flex justify-between py-2 border-b border-white/5">
+                        <span className="text-white/50 uppercase text-[8px] tracking-wider">Peak Single Commission</span>
+                        <span className="text-gold font-mono font-medium">€6,850</span>
+                      </div>
+                      <div className="flex justify-between py-2 border-b border-white/5">
+                        <span className="text-white/50 uppercase text-[8px] tracking-wider">VIP Patron Retention</span>
+                        <span className="text-emerald-400 font-mono font-medium">92.4%</span>
+                      </div>
+                      <div className="flex justify-between py-2">
+                        <span className="text-white/50 uppercase text-[8px] tracking-wider">Gross Couture Margin</span>
+                        <span className="text-white font-mono font-medium">88.5%</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-gold/15">
+                    <button
+                      onClick={() => setAdminSubTab("orders")}
+                      className="w-full py-3 bg-gradient-to-r from-gold via-champagne to-gold text-[#050505] font-sans text-[8px] tracking-[0.3em] uppercase font-semibold hover:opacity-90 transition-opacity"
+                    >
+                      MANAGE CLIENT ORDERS ({orders.length})
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           )}
 
-          {/* SUB-TAB 2: CLIENT ORDERS PAGE & STATUS UPDATES */}
+          {/* ======================================================== */}
+          {/* TAB 2: CLIENT ORDERS PAGE & STATUS UPDATES               */}
+          {/* ======================================================== */}
           {adminSubTab === "orders" && (
             <div className="space-y-6">
               {/* Filter Pills */}
@@ -729,7 +1065,116 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* SUB-TAB 3: CLIENT DIRECT QUERIES & ADMIN REPLY SYSTEM */}
+          {/* ======================================================== */}
+          {/* TAB 3: CLIENT ENQUIRIES LEDGER                           */}
+          {/* ======================================================== */}
+          {adminSubTab === "enquiries" && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 flex-wrap mb-4">
+                <span className="font-sans text-[8px] tracking-[0.25em] uppercase text-white/40 mr-2">
+                  {t.adminDashboard.statusFilter}
+                </span>
+                {[
+                  { id: "all", label: t.adminDashboard.filterAll },
+                  { id: "New", label: t.adminDashboard.filterNew },
+                  { id: "Fitting Scheduled", label: t.adminDashboard.filterFitting },
+                  { id: "Completed", label: t.adminDashboard.filterCompleted },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    onClick={() => setEnquiryFilter(f.id as any)}
+                    className={`px-3 py-1 text-[8px] font-sans tracking-[0.2em] uppercase border transition-colors ${
+                      enquiryFilter === f.id
+                        ? "border-gold bg-gold/15 text-gold"
+                        : "border-white/10 text-white/40 hover:text-white"
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="border border-gold/20 bg-black/50 overflow-x-auto">
+                <table className="w-full text-left font-sans text-xs">
+                  <thead className="border-b border-gold/20 text-[8px] tracking-[0.3em] uppercase text-gold bg-white/[0.02]">
+                    <tr>
+                      <th className="py-3.5 px-4">{t.adminDashboard.colClient}</th>
+                      <th className="py-3.5 px-4">{t.adminDashboard.colContact}</th>
+                      <th className="py-3.5 px-4">{t.adminDashboard.colGarment}</th>
+                      <th className="py-3.5 px-4">{t.adminDashboard.colType}</th>
+                      <th className="py-3.5 px-4">{t.adminDashboard.colDetails}</th>
+                      <th className="py-3.5 px-4">{t.adminDashboard.colStatus}</th>
+                      <th className="py-3.5 px-4 text-right">{t.adminDashboard.colAction}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/10">
+                    {filteredEnquiries.map((enq) => (
+                      <tr key={enq.id} className="hover:bg-white/[0.02] transition-colors">
+                        <td className="py-4 px-4 font-serif text-sm text-white font-medium whitespace-nowrap">
+                          {enq.name}
+                          <span className="block font-sans text-[8px] text-white/40 font-normal tracking-wide">
+                            {enq.date}
+                          </span>
+                        </td>
+                        <td className="py-4 px-4 text-white/70 whitespace-nowrap text-xs font-mono">
+                          {enq.mobile}
+                        </td>
+                        <td className="py-4 px-4 whitespace-nowrap">
+                          <span className="text-gold font-medium text-[10px] tracking-wider block">
+                            {enq.lookTitle}
+                          </span>
+                          <span className="text-[8px] text-white/40 tracking-wider">
+                            {enq.lookSubtitle}
+                          </span>
+                        </td>
+                        <td className="py-4 px-4 text-white/60 text-[10px] tracking-wide whitespace-nowrap">
+                          {enq.enquiryType}
+                        </td>
+                        <td className="py-4 px-4 text-white/70 text-xs max-w-xs leading-relaxed">
+                          {enq.detail}
+                        </td>
+                        <td className="py-4 px-4 whitespace-nowrap">
+                          <span
+                            className={`px-2.5 py-1 text-[8px] font-sans tracking-[0.2em] uppercase rounded-full border ${
+                              enq.status === "New"
+                                ? "border-amber-400/40 bg-amber-500/10 text-amber-300"
+                                : enq.status === "Fitting Scheduled"
+                                ? "border-sky-400/40 bg-sky-500/10 text-sky-300"
+                                : "border-emerald-400/40 bg-emerald-500/10 text-emerald-300"
+                            }`}
+                          >
+                            {enq.status}
+                          </span>
+                        </td>
+                        <td className="py-4 px-4 text-right whitespace-nowrap space-x-2">
+                          {enq.status !== "Fitting Scheduled" && (
+                            <button
+                              onClick={() => updateEnquiryStatus(enq.id, "Fitting Scheduled")}
+                              className="px-2.5 py-1 text-[7px] font-sans tracking-[0.2em] uppercase border border-sky-400/40 text-sky-300 hover:bg-sky-400/10"
+                            >
+                              {t.adminDashboard.markFitting}
+                            </button>
+                          )}
+                          {enq.status !== "Completed" && (
+                            <button
+                              onClick={() => updateEnquiryStatus(enq.id, "Completed")}
+                              className="px-2.5 py-1 text-[7px] font-sans tracking-[0.2em] uppercase border border-emerald-400/40 text-emerald-300 hover:bg-emerald-400/10"
+                            >
+                              {t.adminDashboard.markComplete}
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* ======================================================== */}
+          {/* TAB 4: CLIENT DIRECT QUERIES & ADMIN REPLY SYSTEM       */}
+          {/* ======================================================== */}
           {adminSubTab === "queries" && (
             <div className="space-y-6">
               {/* Filter Pills */}
@@ -889,7 +1334,9 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* SUB-TAB 4: COLLECTION OVERSIGHT */}
+          {/* ======================================================== */}
+          {/* TAB 5: COLLECTION OVERSIGHT                              */}
+          {/* ======================================================== */}
           {adminSubTab === "inventory" && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {collection.map((chapter) => (
@@ -929,7 +1376,9 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* SUB-TAB 5: SALON METRICS */}
+          {/* ======================================================== */}
+          {/* TAB 6: SALON METRICS                                    */}
+          {/* ======================================================== */}
           {adminSubTab === "metrics" && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="p-6 border border-gold/20 bg-black/40">
