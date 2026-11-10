@@ -336,24 +336,26 @@ export default function LoginPage() {
     const areaPathD = `${pathD} L ${points[points.length - 1].x} ${chartHeight} L ${points[0].x} ${chartHeight} Z`;
 
     return (
-      <main className="min-h-screen bg-[#040404] text-ivory pt-24 pb-20 px-4 sm:px-8 lg:px-16 relative overflow-hidden">
+      <main className="min-h-screen bg-[#040404] text-ivory pt-20 sm:pt-24 pb-16 sm:pb-20 px-3 sm:px-8 lg:px-16 relative overflow-hidden overflow-x-clip">
         {/* Dynamic ambient gold background aura */}
-        <div className="absolute top-10 right-1/4 w-[750px] h-[750px] bg-gold/10 blur-[180px] pointer-events-none" />
-        <div className="absolute top-2/3 left-1/4 w-[500px] h-[500px] bg-champagne/5 blur-[160px] pointer-events-none" />
+        <div className="absolute top-10 right-1/4 w-[750px] max-w-full h-[750px] bg-gold/10 blur-[180px] pointer-events-none" />
+        <div className="absolute top-2/3 left-1/4 w-[500px] max-w-full h-[500px] bg-champagne/5 blur-[160px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Executive Telemetry & Global Store Strip */}
-          <div className="mb-6 p-2.5 bg-black/60 border border-gold/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-[8px] font-sans tracking-widest uppercase">
-            <div className="flex items-center gap-3">
-              <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
+          <div className="mb-6 p-2.5 sm:p-3 bg-black/70 border border-gold/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-2.5 text-[7.5px] sm:text-[8px] font-sans tracking-widest uppercase rounded-sm">
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+              <span className="flex items-center gap-1.5 text-emerald-400 font-semibold whitespace-nowrap">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 LIVE STORE NODE · ONLINE
               </span>
-              <span className="text-white/20">|</span>
-              <span className="text-white/50">PARIS · MILAN · DUBAI · NYC · ZURICH</span>
+              <span className="text-white/20 hidden sm:inline">|</span>
+              <span className="text-white/50 text-[7px] sm:text-[8px] leading-relaxed">
+                PARIS · MILAN · DUBAI · NYC · ZURICH
+              </span>
             </div>
-            <div className="flex items-center gap-4 text-gold/80 flex-wrap">
-              <span>LOCAL STORE TIME:</span>
+            <div className="flex items-center gap-2 sm:gap-4 text-gold/80 flex-wrap text-[7px] sm:text-[8px]">
+              <span className="text-white/40">LOCAL STORE TIME:</span>
               <span className="text-white/80">PARIS <strong className="text-white">10:45 CET</strong></span>
               <span className="text-white/80">DUBAI <strong className="text-white">13:45 GST</strong></span>
               <span className="text-white/80">NYC <strong className="text-white">04:45 EST</strong></span>
@@ -361,42 +363,42 @@ export default function LoginPage() {
           </div>
 
           {/* Top Director Bar */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gold/20 pb-6 mb-8">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gold/20 pb-5 sm:pb-6 mb-6 sm:mb-8">
+            <div className="flex items-center gap-3 sm:gap-4">
               <Link
                 href="/"
-                className="p-2.5 border border-gold/40 hover:border-gold hover:bg-gold/10 rounded-full text-gold transition-colors flex items-center justify-center shadow-[0_0_15px_rgba(197,160,89,0.2)]"
+                className="p-2.5 border border-gold/40 hover:border-gold hover:bg-gold/10 rounded-full text-gold transition-colors flex items-center justify-center shadow-[0_0_15px_rgba(197,160,89,0.2)] shrink-0"
                 title="Return to Store"
               >
                 <ArrowLeft size={16} />
               </Link>
               <div>
-                <div className="flex items-center gap-2">
-                  <Crown size={16} className="text-gold" />
-                  <span className="font-sans text-[9px] tracking-[0.35em] uppercase text-gold font-semibold">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <Crown size={15} className="text-gold shrink-0" />
+                  <span className="font-sans text-[8px] sm:text-[9px] tracking-[0.3em] sm:tracking-[0.35em] uppercase text-gold font-semibold">
                     {t.adminDashboard.title}
                   </span>
                 </div>
-                <h1 className="font-serif text-3xl sm:text-4xl text-ivory tracking-wider mt-0.5">
+                <h1 className="font-serif text-2xl sm:text-4xl text-ivory tracking-wider mt-0.5">
                   {t.adminDashboard.directorTitle}
                 </h1>
-                <p className="font-sans text-xs text-white/50 font-light mt-0.5">
+                <p className="font-sans text-[11px] sm:text-xs text-white/50 font-light mt-0.5">
                   {t.adminDashboard.welcome}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center flex-wrap gap-2 w-full sm:w-auto justify-between sm:justify-end pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
               {renderLanguageSelector()}
               <Link
                 href="/"
-                className="px-4 py-2 border border-gold/40 hover:bg-gold/10 font-sans text-[8px] tracking-[0.25em] uppercase text-ivory/80 transition-colors"
+                className="px-3 sm:px-4 py-2 border border-gold/40 hover:bg-gold/10 font-sans text-[7.5px] sm:text-[8px] tracking-[0.2em] sm:tracking-[0.25em] uppercase text-ivory/80 transition-colors whitespace-nowrap text-center flex-1 sm:flex-initial"
               >
                 {t.adminDashboard.viewBoutique}
               </Link>
               <button
                 onClick={logout}
-                className="px-4 py-2 bg-rose-950/40 border border-rose-500/40 hover:bg-rose-900/50 text-rose-200 font-sans text-[8px] tracking-[0.25em] uppercase flex items-center gap-1.5 transition-colors"
+                className="px-3 sm:px-4 py-2 bg-rose-950/40 border border-rose-500/40 hover:bg-rose-900/50 text-rose-200 font-sans text-[7.5px] sm:text-[8px] tracking-[0.2em] sm:tracking-[0.25em] uppercase flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap flex-1 sm:flex-initial"
               >
                 <LogOut size={12} />
                 <span>{t.adminDashboard.logout}</span>
@@ -405,7 +407,7 @@ export default function LoginPage() {
           </div>
 
           {/* Luxury Executive KPI Strip */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 mb-6 sm:mb-8">
             {[
               {
                 label: "TOTAL GROSS REVENUE",
@@ -440,25 +442,25 @@ export default function LoginPage() {
               return (
                 <div
                   key={idx}
-                  className="p-5 border border-gold/25 bg-[#0a0a0a]/90 backdrop-blur-md rounded-sm relative overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.6)] group hover:border-gold/50 transition-colors"
+                  className="p-3.5 sm:p-5 border border-gold/25 bg-[#0a0a0a]/90 backdrop-blur-md rounded-sm relative overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.6)] group hover:border-gold/50 transition-colors"
                 >
-                  <div className="absolute top-0 right-0 p-3 opacity-20 text-gold group-hover:opacity-40 transition-opacity">
-                    <Icon size={28} />
+                  <div className="absolute top-0 right-0 p-2 sm:p-3 opacity-20 text-gold group-hover:opacity-40 transition-opacity">
+                    <Icon size={24} className="sm:w-7 sm:h-7" />
                   </div>
-                  <div className="h-0.5 w-10 bg-gradient-to-r from-gold to-champagne mb-3" />
-                  <p className="font-sans text-[8px] tracking-[0.25em] uppercase text-white/50 mb-1">
+                  <div className="h-0.5 w-8 sm:w-10 bg-gradient-to-r from-gold to-champagne mb-2 sm:mb-3" />
+                  <p className="font-sans text-[7.5px] sm:text-[8px] tracking-[0.2em] sm:tracking-[0.25em] uppercase text-white/50 mb-1 truncate">
                     {kpi.label}
                   </p>
-                  <p className="font-serif text-2xl sm:text-3xl text-white font-medium mb-1 tracking-wide">
+                  <p className="font-serif text-xl sm:text-3xl text-white font-medium mb-1 tracking-wide leading-tight">
                     {kpi.value}
                   </p>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
                     {kpi.trend && (
-                      <span className="inline-flex items-center text-emerald-400 text-[8px] font-sans font-semibold">
+                      <span className="inline-flex items-center text-emerald-400 text-[8px] font-sans font-semibold shrink-0">
                         <ArrowUpRight size={10} />
                       </span>
                     )}
-                    <span className="font-sans text-[8px] text-gold/90 tracking-wide">{kpi.sub}</span>
+                    <span className="font-sans text-[7.5px] sm:text-[8px] text-gold/90 tracking-wide line-clamp-1">{kpi.sub}</span>
                   </div>
                 </div>
               );
@@ -466,7 +468,7 @@ export default function LoginPage() {
           </div>
 
           {/* Admin Navigation Tabs */}
-          <div className="flex border-b border-gold/20 mb-8 gap-2 sm:gap-4 overflow-x-auto">
+          <div className="flex border-b border-gold/20 mb-6 sm:mb-8 gap-1.5 sm:gap-4 overflow-x-auto no-scrollbar scroll-smooth touch-pan-x [&::-webkit-scrollbar]:hidden">
             {[
               { id: "revenue", label: t.adminDashboard.tabRevenue || "REVENUE & FINANCIALS", icon: BarChart3 },
               { id: "orders", label: `${t.adminDashboard.tabOrders} (${orders.length})`, icon: Package },
@@ -481,7 +483,7 @@ export default function LoginPage() {
                 <button
                   key={tab.id}
                   onClick={() => setAdminSubTab(tab.id as any)}
-                  className={`py-3.5 px-4 font-sans text-[9px] tracking-[0.25em] uppercase transition-all relative flex items-center gap-2 whitespace-nowrap ${
+                  className={`py-3 sm:py-3.5 px-3 sm:px-4 font-sans text-[8px] sm:text-[9px] tracking-[0.2em] sm:tracking-[0.25em] uppercase transition-all relative flex items-center gap-1.5 sm:gap-2 whitespace-nowrap shrink-0 ${
                     isActive ? "text-gold font-semibold" : "text-white/40 hover:text-white"
                   }`}
                 >
@@ -504,32 +506,32 @@ export default function LoginPage() {
           {adminSubTab === "revenue" && (
             <div className="space-y-8">
               {/* Main Revenue Chart Card */}
-              <div className="border border-gold/30 bg-[#0a0a0a]/95 backdrop-blur-xl p-6 sm:p-8 rounded-sm shadow-[0_25px_70px_rgba(0,0,0,0.85)] relative">
+              <div className="border border-gold/30 bg-[#0a0a0a]/95 backdrop-blur-xl p-4 sm:p-8 rounded-sm shadow-[0_25px_70px_rgba(0,0,0,0.85)] relative">
                 {/* Header controls */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-6 mb-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5 sm:pb-6 mb-5 sm:mb-6">
                   <div>
                     <div className="flex items-center gap-2 text-gold mb-1">
-                      <TrendingUp size={16} />
-                      <span className="font-sans text-[8px] tracking-[0.35em] uppercase font-semibold">
+                      <TrendingUp size={15} className="sm:w-4 sm:h-4" />
+                      <span className="font-sans text-[7.5px] sm:text-[8px] tracking-[0.3em] sm:tracking-[0.35em] uppercase font-semibold">
                         EXECUTIVE FINANCIAL INTELLIGENCE
                       </span>
                     </div>
                     <h2 className="font-serif text-2xl sm:text-3xl text-white tracking-wide">
                       Aurelle Revenue Trajectory
                     </h2>
-                    <p className="font-sans text-xs text-white/50 mt-1">
+                    <p className="font-sans text-[11px] sm:text-xs text-white/50 mt-1">
                       Aggregated store sales, custom orders, and VIP client purchase velocity.
                     </p>
                   </div>
 
                   {/* Timeframe switchers */}
-                  <div className="flex items-center gap-2 self-start sm:self-auto border border-gold/25 p-1 bg-black/60">
+                  <div className="grid grid-cols-2 sm:flex items-center gap-1 sm:gap-2 w-full sm:w-auto border border-gold/25 p-1 bg-black/60">
                     <button
                       onClick={() => {
                         setRevenueTimeframe("full");
                         setHoveredMonthIndex(REVENUE_HISTORY.length - 1);
                       }}
-                      className={`px-3 py-1.5 font-sans text-[8px] tracking-[0.2em] uppercase transition-colors ${
+                      className={`px-2.5 sm:px-3 py-1.5 font-sans text-[7.5px] sm:text-[8px] tracking-[0.15em] sm:tracking-[0.2em] uppercase transition-colors text-center ${
                         revenueTimeframe === "full"
                           ? "bg-gold text-[#050505] font-semibold"
                           : "text-white/50 hover:text-white"
@@ -542,7 +544,7 @@ export default function LoginPage() {
                         setRevenueTimeframe("h2");
                         setHoveredMonthIndex(REVENUE_HISTORY.slice(5).length - 1);
                       }}
-                      className={`px-3 py-1.5 font-sans text-[8px] tracking-[0.2em] uppercase transition-colors ${
+                      className={`px-2.5 sm:px-3 py-1.5 font-sans text-[7.5px] sm:text-[8px] tracking-[0.15em] sm:tracking-[0.2em] uppercase transition-colors text-center ${
                         revenueTimeframe === "h2"
                           ? "bg-gold text-[#050505] font-semibold"
                           : "text-white/50 hover:text-white"
@@ -554,47 +556,55 @@ export default function LoginPage() {
                 </div>
 
                 {/* Interactive Tooltip Card for Active Month */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 bg-white/[0.02] border border-gold/20 mb-6">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 p-3 sm:p-4 bg-white/[0.02] border border-gold/20 mb-6">
                   <div>
-                    <span className="font-sans text-[7.5px] uppercase tracking-[0.25em] text-white/40 block mb-1">
+                    <span className="font-sans text-[7px] sm:text-[7.5px] uppercase tracking-[0.25em] text-white/40 block mb-1">
                       ACTIVE CYCLE
                     </span>
-                    <span className="font-serif text-lg text-white font-medium">
+                    <span className="font-serif text-base sm:text-lg text-white font-medium block">
                       {currentMonthData.month} 2026
                     </span>
                   </div>
                   <div>
-                    <span className="font-sans text-[7.5px] uppercase tracking-[0.25em] text-white/40 block mb-1">
+                    <span className="font-sans text-[7px] sm:text-[7.5px] uppercase tracking-[0.25em] text-white/40 block mb-1">
                       MONTHLY GROSS REVENUE
                     </span>
-                    <span className="font-serif text-lg text-gold font-semibold">
-                      €{currentMonthData.revenue.toLocaleString()}
-                    </span>
-                    <span className="text-[9px] text-emerald-400 font-sans ml-1.5">
-                      {currentMonthData.change}
-                    </span>
+                    <div className="flex items-baseline gap-1">
+                      <span className="font-serif text-base sm:text-lg text-gold font-semibold">
+                        €{currentMonthData.revenue.toLocaleString()}
+                      </span>
+                      <span className="text-[8px] sm:text-[9px] text-emerald-400 font-sans">
+                        {currentMonthData.change}
+                      </span>
+                    </div>
                   </div>
                   <div>
-                    <span className="font-sans text-[7.5px] uppercase tracking-[0.25em] text-white/40 block mb-1">
+                    <span className="font-sans text-[7px] sm:text-[7.5px] uppercase tracking-[0.25em] text-white/40 block mb-1">
                       COMMISSIONED LOOKS
                     </span>
-                    <span className="font-serif text-lg text-white font-medium">
+                    <span className="font-serif text-base sm:text-lg text-white font-medium block">
                       {currentMonthData.ordersCount} Custom Orders
                     </span>
                   </div>
                   <div>
-                    <span className="font-sans text-[7.5px] uppercase tracking-[0.25em] text-white/40 block mb-1">
+                    <span className="font-sans text-[7px] sm:text-[7.5px] uppercase tracking-[0.25em] text-white/40 block mb-1">
                       COLLECTION LEADER
                     </span>
-                    <span className="font-sans text-xs text-gold/90 tracking-wider font-semibold">
+                    <span className="font-sans text-[11px] sm:text-xs text-gold/90 tracking-wider font-semibold block truncate">
                       {currentMonthData.topGarment}
                     </span>
                   </div>
                 </div>
 
+                {/* Mobile horizontal swipe hint */}
+                <div className="sm:hidden flex items-center justify-between text-[7px] uppercase tracking-widest text-gold/70 mb-2 px-1">
+                  <span>← Swipe horizontally to explore months →</span>
+                  <span>Tap month to inspect</span>
+                </div>
+
                 {/* SVG Revenue Graph Canvas */}
-                <div className="w-full overflow-x-auto pb-4">
-                  <div className="min-w-[680px]">
+                <div className="w-full overflow-x-auto pb-4 touch-pan-x [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-white/5 [&::-webkit-scrollbar-thumb]:bg-gold/30">
+                  <div className="min-w-[620px] sm:min-w-[680px]">
                     <svg
                       viewBox={`0 0 ${chartWidth} ${chartHeight + 40}`}
                       className="w-full h-64 sm:h-72 overflow-visible"
@@ -721,24 +731,24 @@ export default function LoginPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-[8px] font-sans tracking-widest uppercase text-white/40 pt-4 border-t border-white/5">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1.5 text-[7.5px] sm:text-[8px] font-sans tracking-widest uppercase text-white/40 pt-4 border-t border-white/5">
                   <span>Hover or tap any month marker to inspect sales analytics</span>
                   <span className="text-gold font-medium">Audited Store Books · Fiscal 2026</span>
                 </div>
               </div>
 
               {/* Three Strategic Breakdown Panels */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
                 {/* 1. Global Store Distribution */}
-                <div className="border border-gold/25 bg-[#0a0a0a] p-6 rounded-sm">
-                  <div className="flex items-center justify-between border-b border-gold/15 pb-3 mb-5">
-                    <span className="font-sans text-[8px] tracking-[0.3em] uppercase text-gold font-semibold">
+                <div className="border border-gold/25 bg-[#0a0a0a] p-4 sm:p-6 rounded-sm">
+                  <div className="flex items-center justify-between border-b border-gold/15 pb-3 mb-4 sm:mb-5">
+                    <span className="font-sans text-[7.5px] sm:text-[8px] tracking-[0.3em] uppercase text-gold font-semibold">
                       STORE REVENUE BY CITY
                     </span>
                     <Globe size={12} className="text-gold" />
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-3.5 sm:space-y-4">
                     {[
                       { city: "Paris (Flagship Store)", share: "38%", amount: "€76,532" },
                       { city: "Milan (Fashion Suite)", share: "24%", amount: "€48,336" },
@@ -760,15 +770,15 @@ export default function LoginPage() {
                 </div>
 
                 {/* 2. Collection Dress Share */}
-                <div className="border border-gold/25 bg-[#0a0a0a] p-6 rounded-sm">
-                  <div className="flex items-center justify-between border-b border-gold/15 pb-3 mb-5">
-                    <span className="font-sans text-[8px] tracking-[0.3em] uppercase text-gold font-semibold">
+                <div className="border border-gold/25 bg-[#0a0a0a] p-4 sm:p-6 rounded-sm">
+                  <div className="flex items-center justify-between border-b border-gold/15 pb-3 mb-4 sm:mb-5">
+                    <span className="font-sans text-[7.5px] sm:text-[8px] tracking-[0.3em] uppercase text-gold font-semibold">
                       REVENUE BY DRESS COLLECTION
                     </span>
                     <Sparkles size={12} className="text-gold" />
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-3.5 sm:space-y-4">
                     {[
                       { name: "THE SPOTLIGHT (Emerald Gown)", pct: "42%", total: "€84,588" },
                       { name: "THE FLAPPER (Beaded Fringe)", pct: "26%", total: "€52,364" },
@@ -790,16 +800,16 @@ export default function LoginPage() {
                 </div>
 
                 {/* 3. Executive Financial Metrics */}
-                <div className="border border-gold/25 bg-[#0a0a0a] p-6 rounded-sm flex flex-col justify-between">
+                <div className="border border-gold/25 bg-[#0a0a0a] p-4 sm:p-6 rounded-sm flex flex-col justify-between">
                   <div>
-                    <div className="flex items-center justify-between border-b border-gold/15 pb-3 mb-5">
-                      <span className="font-sans text-[8px] tracking-[0.3em] uppercase text-gold font-semibold">
+                    <div className="flex items-center justify-between border-b border-gold/15 pb-3 mb-4 sm:mb-5">
+                      <span className="font-sans text-[7.5px] sm:text-[8px] tracking-[0.3em] uppercase text-gold font-semibold">
                         EXECUTIVE FINANCIAL BENCHMARKS
                       </span>
                       <Crown size={12} className="text-gold" />
                     </div>
 
-                    <div className="space-y-4 font-sans text-xs">
+                    <div className="space-y-3 sm:space-y-4 font-sans text-xs">
                       <div className="flex justify-between py-2 border-b border-white/5">
                         <span className="text-white/50 uppercase text-[8px] tracking-wider">Average Order Value (AOV)</span>
                         <span className="text-white font-mono font-medium">€3,420</span>
@@ -822,7 +832,7 @@ export default function LoginPage() {
                   <div className="pt-4 border-t border-gold/15">
                     <button
                       onClick={() => setAdminSubTab("orders")}
-                      className="w-full py-3 bg-gradient-to-r from-gold via-champagne to-gold text-[#050505] font-sans text-[8px] tracking-[0.3em] uppercase font-semibold hover:opacity-90 transition-opacity"
+                      className="w-full py-3 bg-gradient-to-r from-gold via-champagne to-gold text-[#050505] font-sans text-[8px] tracking-[0.25em] sm:tracking-[0.3em] uppercase font-semibold hover:opacity-90 transition-opacity"
                     >
                       MANAGE CLIENT ORDERS ({orders.length})
                     </button>
@@ -838,9 +848,9 @@ export default function LoginPage() {
           {adminSubTab === "orders" && (
             <div className="space-y-6">
               {/* Filter Pills */}
-              <div className="flex items-center justify-between flex-wrap gap-4">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-sans text-[8px] tracking-[0.25em] uppercase text-white/40 mr-1">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                  <span className="font-sans text-[7.5px] sm:text-[8px] tracking-[0.25em] uppercase text-white/40 mr-1">
                     {t.adminDashboard.statusFilter}
                   </span>
                   {[
@@ -865,7 +875,7 @@ export default function LoginPage() {
                     <button
                       key={filter.id}
                       onClick={() => setAdminOrderFilter(filter.id as any)}
-                      className={`px-3 py-1 text-[8px] font-sans tracking-[0.2em] uppercase border transition-colors ${
+                      className={`px-2.5 sm:px-3 py-1.5 sm:py-1 text-[7.5px] sm:text-[8px] font-sans tracking-[0.15em] sm:tracking-[0.2em] uppercase border transition-colors ${
                         adminOrderFilter === filter.id
                           ? "border-gold bg-gold/15 text-gold font-semibold"
                           : "border-white/10 text-white/40 hover:text-white"
@@ -876,7 +886,7 @@ export default function LoginPage() {
                   ))}
                 </div>
 
-                <span className="font-sans text-[9px] text-white/40 uppercase tracking-widest">
+                <span className="font-sans text-[8px] sm:text-[9px] text-white/40 uppercase tracking-widest self-end sm:self-auto">
                   {t.adminDashboard.orderSectionTitle}
                 </span>
               </div>
@@ -890,7 +900,7 @@ export default function LoginPage() {
                     exit={{ opacity: 0, y: -8 }}
                     className="p-3 bg-emerald-500/10 border border-emerald-400/40 text-emerald-300 text-xs font-sans flex items-center gap-2 rounded-sm"
                   >
-                    <CheckCircle2 size={14} className="text-emerald-400" />
+                    <CheckCircle2 size={14} className="text-emerald-400 shrink-0" />
                     <span>{orderNotification}</span>
                   </motion.div>
                 )}
@@ -912,16 +922,16 @@ export default function LoginPage() {
                     return (
                       <div
                         key={order.id}
-                        className="border border-gold/25 bg-[#0a0a0a] p-5 sm:p-6 rounded-sm shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all"
+                        className="border border-gold/25 bg-[#0a0a0a] p-4 sm:p-6 rounded-sm shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all"
                       >
                         {/* Order Header */}
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4 mb-4">
-                          <div className="flex items-center gap-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-3.5 sm:pb-4 mb-4">
+                          <div className="flex items-start sm:items-center gap-3">
                             <div className="w-10 h-10 bg-gold/10 border border-gold/30 rounded-sm flex items-center justify-center shrink-0">
                               <Package size={18} className="text-gold" />
                             </div>
                             <div>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2 flex-wrap">
                                 <span className="font-mono text-xs font-semibold text-gold tracking-wider">
                                   #{order.id}
                                 </span>
@@ -930,14 +940,14 @@ export default function LoginPage() {
                                   {order.date}
                                 </span>
                               </div>
-                              <h4 className="font-serif text-base text-white tracking-wide mt-0.5">
+                              <h4 className="font-serif text-base sm:text-lg text-white tracking-wide mt-0.5">
                                 {order.item}
                               </h4>
                               <p className="font-sans text-xs text-white/50">{order.subtitle}</p>
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-4 self-end sm:self-center">
+                          <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
                             <span className="font-serif text-lg text-gold font-medium">
                               {order.price}
                             </span>
@@ -969,7 +979,7 @@ export default function LoginPage() {
                         </div>
 
                         {/* Customer & Delivery Information */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 bg-white/[0.015] p-3.5 border border-white/5 text-xs font-sans">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 bg-white/[0.015] p-3 sm:p-3.5 border border-white/5 text-xs font-sans">
                           <div>
                             <span className="font-sans text-[7.5px] uppercase tracking-[0.25em] text-gold/80 block mb-1">
                               CLIENT CREDENTIALS
@@ -990,7 +1000,7 @@ export default function LoginPage() {
                             </p>
                             {order.trackingNumber && (
                               <div className="flex items-center gap-1.5 mt-1.5 text-sky-300 font-mono text-[10px]">
-                                <Truck size={12} />
+                                <Truck size={12} className="shrink-0" />
                                 <span>Tracking: {order.trackingNumber}</span>
                               </div>
                             )}
@@ -998,17 +1008,17 @@ export default function LoginPage() {
                         </div>
 
                         {/* Admin Status Update Actions */}
-                        <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-white/5">
-                          <span className="font-sans text-[8px] uppercase tracking-[0.25em] text-white/40">
+                        <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-t border-white/5">
+                          <span className="font-sans text-[7.5px] sm:text-[8px] uppercase tracking-[0.25em] text-white/40">
                             {t.adminDashboard.orderColAction}:
                           </span>
 
-                          <div className="flex items-center gap-2 flex-wrap">
+                          <div className="grid grid-cols-2 sm:flex sm:items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
                             <button
                               type="button"
                               disabled={isProcessing || updatingOrderId === order.id}
                               onClick={() => handleUpdateOrderStatus(order.id, "Processing")}
-                              className={`px-3 py-1.5 font-sans text-[7.5px] tracking-wider uppercase border transition-all ${
+                              className={`py-2 px-2.5 sm:py-1.5 sm:px-3 font-sans text-[7.5px] sm:text-[8px] tracking-wider uppercase border transition-all text-center justify-center flex items-center ${
                                 isProcessing
                                   ? "border-amber-400/30 bg-amber-500/10 text-amber-300/40 cursor-not-allowed"
                                   : "border-amber-400/50 text-amber-300 hover:bg-amber-400/15 cursor-pointer"
@@ -1021,7 +1031,7 @@ export default function LoginPage() {
                               type="button"
                               disabled={isDispatched || updatingOrderId === order.id}
                               onClick={() => handleUpdateOrderStatus(order.id, "Dispatched")}
-                              className={`px-3 py-1.5 font-sans text-[7.5px] tracking-wider uppercase border transition-all ${
+                              className={`py-2 px-2.5 sm:py-1.5 sm:px-3 font-sans text-[7.5px] sm:text-[8px] tracking-wider uppercase border transition-all text-center justify-center flex items-center ${
                                 isDispatched
                                   ? "border-sky-400/30 bg-sky-500/10 text-sky-300/40 cursor-not-allowed"
                                   : "border-sky-400/50 text-sky-300 hover:bg-sky-400/15 cursor-pointer"
@@ -1034,7 +1044,7 @@ export default function LoginPage() {
                               type="button"
                               disabled={isDelivered || updatingOrderId === order.id}
                               onClick={() => handleUpdateOrderStatus(order.id, "Delivered")}
-                              className={`px-3 py-1.5 font-sans text-[7.5px] tracking-wider uppercase border transition-all ${
+                              className={`py-2 px-2.5 sm:py-1.5 sm:px-3 font-sans text-[7.5px] sm:text-[8px] tracking-wider uppercase border transition-all text-center justify-center flex items-center ${
                                 isDelivered
                                   ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-300/40 cursor-not-allowed"
                                   : "border-emerald-400/50 text-emerald-300 hover:bg-emerald-400/15 cursor-pointer"
@@ -1047,7 +1057,7 @@ export default function LoginPage() {
                               type="button"
                               disabled={isCancelled || updatingOrderId === order.id}
                               onClick={() => handleUpdateOrderStatus(order.id, "Cancelled")}
-                              className={`px-3 py-1.5 font-sans text-[7.5px] tracking-wider uppercase border transition-all ${
+                              className={`py-2 px-2.5 sm:py-1.5 sm:px-3 font-sans text-[7.5px] sm:text-[8px] tracking-wider uppercase border transition-all text-center justify-center flex items-center ${
                                 isCancelled
                                   ? "border-rose-400/30 bg-rose-500/10 text-rose-300/40 cursor-not-allowed"
                                   : "border-rose-400/50 text-rose-300 hover:bg-rose-400/15 cursor-pointer"
@@ -1070,8 +1080,8 @@ export default function LoginPage() {
           {/* ======================================================== */}
           {adminSubTab === "enquiries" && (
             <div className="space-y-4">
-              <div className="flex items-center gap-2 flex-wrap mb-4">
-                <span className="font-sans text-[8px] tracking-[0.25em] uppercase text-white/40 mr-2">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap mb-4">
+                <span className="font-sans text-[7.5px] sm:text-[8px] tracking-[0.25em] uppercase text-white/40 mr-1 sm:mr-2">
                   {t.adminDashboard.statusFilter}
                 </span>
                 {[
@@ -1083,9 +1093,9 @@ export default function LoginPage() {
                   <button
                     key={f.id}
                     onClick={() => setEnquiryFilter(f.id as any)}
-                    className={`px-3 py-1 text-[8px] font-sans tracking-[0.2em] uppercase border transition-colors ${
+                    className={`px-2.5 sm:px-3 py-1.5 sm:py-1 text-[7.5px] sm:text-[8px] font-sans tracking-[0.15em] sm:tracking-[0.2em] uppercase border transition-colors ${
                       enquiryFilter === f.id
-                        ? "border-gold bg-gold/15 text-gold"
+                        ? "border-gold bg-gold/15 text-gold font-semibold"
                         : "border-white/10 text-white/40 hover:text-white"
                     }`}
                   >
@@ -1094,8 +1104,13 @@ export default function LoginPage() {
                 ))}
               </div>
 
-              <div className="border border-gold/20 bg-black/50 overflow-x-auto">
-                <table className="w-full text-left font-sans text-xs">
+              {/* Mobile swipe hint */}
+              <div className="sm:hidden text-[7px] uppercase tracking-widest text-gold/70 mb-2 px-1">
+                ← Swipe table horizontally to view ledger →
+              </div>
+
+              <div className="border border-gold/20 bg-black/50 overflow-x-auto touch-pan-x [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:bg-gold/30">
+                <table className="w-full text-left font-sans text-xs min-w-[680px]">
                   <thead className="border-b border-gold/20 text-[8px] tracking-[0.3em] uppercase text-gold bg-white/[0.02]">
                     <tr>
                       <th className="py-3.5 px-4">{t.adminDashboard.colClient}</th>
@@ -1178,9 +1193,9 @@ export default function LoginPage() {
           {adminSubTab === "queries" && (
             <div className="space-y-6">
               {/* Filter Pills */}
-              <div className="flex items-center justify-between flex-wrap gap-4">
-                <div className="flex items-center gap-2">
-                  <span className="font-sans text-[8px] tracking-[0.25em] uppercase text-white/40 mr-1">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                  <span className="font-sans text-[7.5px] sm:text-[8px] tracking-[0.25em] uppercase text-white/40 mr-1">
                     {t.adminDashboard.statusFilter}
                   </span>
                   {[
@@ -1197,9 +1212,9 @@ export default function LoginPage() {
                     <button
                       key={filter.id}
                       onClick={() => setAdminQueryFilter(filter.id as any)}
-                      className={`px-3 py-1 text-[8px] font-sans tracking-[0.2em] uppercase border transition-colors ${
+                      className={`px-2.5 sm:px-3 py-1.5 sm:py-1 text-[7.5px] sm:text-[8px] font-sans tracking-[0.15em] sm:tracking-[0.2em] uppercase border transition-colors ${
                         adminQueryFilter === filter.id
-                          ? "border-gold bg-gold/15 text-gold"
+                          ? "border-gold bg-gold/15 text-gold font-semibold"
                           : "border-white/10 text-white/40 hover:text-white"
                       }`}
                     >
@@ -1208,7 +1223,7 @@ export default function LoginPage() {
                   ))}
                 </div>
 
-                <span className="font-sans text-[9px] text-white/40 uppercase tracking-widest">
+                <span className="font-sans text-[8px] sm:text-[9px] text-white/40 uppercase tracking-widest self-end sm:self-auto">
                   {t.adminDashboard.querySectionTitle}
                 </span>
               </div>
@@ -1223,19 +1238,19 @@ export default function LoginPage() {
                   {filteredAdminQueries.map((item) => (
                     <div
                       key={item.id}
-                      className="border border-gold/25 bg-[#0a0a0a] p-6 rounded-sm shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all"
+                      className="border border-gold/25 bg-[#0a0a0a] p-4 sm:p-6 rounded-sm shadow-[0_10px_30px_rgba(0,0,0,0.5)] transition-all"
                     >
                       {/* Query Header */}
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4 mb-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-3.5 sm:pb-4 mb-4">
                         <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-serif text-lg text-white font-medium">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-serif text-base sm:text-lg text-white font-medium">
                               {item.customerName}
                             </span>
                             <span className="font-mono text-[10px] text-white/40">({item.customerEmail})</span>
                           </div>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="font-sans text-[9px] uppercase tracking-wider text-gold font-semibold">
+                          <div className="flex items-center gap-2 mt-1 flex-wrap">
+                            <span className="font-sans text-[8.5px] sm:text-[9px] uppercase tracking-wider text-gold font-semibold">
                               {item.subject}
                             </span>
                             <span className="text-white/20">•</span>
@@ -1245,9 +1260,9 @@ export default function LoginPage() {
                           </div>
                         </div>
 
-                        <div>
+                        <div className="self-start sm:self-auto">
                           <span
-                            className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[8px] font-sans tracking-[0.25em] uppercase border font-semibold ${
+                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[8px] font-sans tracking-[0.2em] sm:tracking-[0.25em] uppercase border font-semibold ${
                               item.status === "Open"
                                 ? "border-amber-400/50 bg-amber-500/10 text-amber-300"
                                 : "border-emerald-400/50 bg-emerald-500/10 text-emerald-300"
@@ -1264,7 +1279,7 @@ export default function LoginPage() {
                       </div>
 
                       {/* Customer Question / Message */}
-                      <div className="mb-5 bg-white/[0.02] border-l-2 border-gold/40 p-4">
+                      <div className="mb-4 sm:mb-5 bg-white/[0.02] border-l-2 border-gold/40 p-3.5 sm:p-4">
                         <p className="font-sans text-xs text-white/80 leading-relaxed">
                           "{item.message}"
                         </p>
@@ -1272,9 +1287,9 @@ export default function LoginPage() {
 
                       {/* Admin Reply Display (if replied) */}
                       {item.adminReply && (
-                        <div className="mb-4 bg-gold/5 border border-gold/30 p-4 rounded-sm">
+                        <div className="mb-4 bg-gold/5 border border-gold/30 p-3.5 sm:p-4 rounded-sm">
                           <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-1.5 text-gold text-[9px] font-sans font-semibold uppercase tracking-wider">
+                            <div className="flex items-center gap-1.5 text-gold text-[8.5px] sm:text-[9px] font-sans font-semibold uppercase tracking-wider">
                               <Crown size={12} />
                               <span>{t.adminDashboard.queryReplyLabel}</span>
                             </div>
@@ -1292,7 +1307,7 @@ export default function LoginPage() {
 
                       {/* Reply Input Box */}
                       <div className="pt-2">
-                        <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/40 mb-2">
+                        <label className="block font-sans text-[7.5px] sm:text-[8px] tracking-[0.25em] uppercase text-white/40 mb-2">
                           {item.adminReply ? "Update / Send Follow-up Response" : t.adminDashboard.queryColAction}
                         </label>
                         <div className="flex flex-col sm:flex-row gap-3">
@@ -1303,13 +1318,13 @@ export default function LoginPage() {
                               setReplyDrafts((prev) => ({ ...prev, [item.id]: e.target.value }))
                             }
                             placeholder={t.adminDashboard.queryReplyPlaceholder}
-                            className="flex-1 bg-black/60 border border-gold/25 focus:border-gold px-3 py-2 text-xs text-white placeholder:text-white/20 outline-none transition-colors rounded-none"
+                            className="w-full sm:flex-1 bg-black/60 border border-gold/25 focus:border-gold px-3 py-2 text-xs text-white placeholder:text-white/20 outline-none transition-colors rounded-none"
                           />
                           <button
                             type="button"
                             disabled={!replyDrafts[item.id]?.trim() || replySendingId === item.id}
                             onClick={() => handleAdminSendReply(item.id)}
-                            className="sm:w-44 py-3 px-4 bg-gradient-to-r from-gold via-champagne to-gold text-[#050505] font-sans text-[8px] tracking-[0.25em] uppercase font-semibold hover:opacity-90 disabled:opacity-40 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap self-stretch sm:self-auto"
+                            className="w-full sm:w-44 py-3 px-4 bg-gradient-to-r from-gold via-champagne to-gold text-[#050505] font-sans text-[8px] tracking-[0.2em] sm:tracking-[0.25em] uppercase font-semibold hover:opacity-90 disabled:opacity-40 transition-all flex items-center justify-center gap-1.5 whitespace-nowrap self-stretch sm:self-auto"
                           >
                             {replySendingId === item.id ? (
                               <span>Sending...</span>
@@ -1338,22 +1353,22 @@ export default function LoginPage() {
           {/* TAB 5: COLLECTION OVERSIGHT                              */}
           {/* ======================================================== */}
           {adminSubTab === "inventory" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {collection.map((chapter) => (
                 <div
                   key={chapter.id}
-                  className="border border-gold/25 p-5 bg-black/40 rounded-sm relative flex flex-col justify-between"
+                  className="border border-gold/25 p-4 sm:p-5 bg-black/40 rounded-sm relative flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="font-sans text-[8px] tracking-[0.3em] uppercase text-gold font-medium">
+                      <span className="font-sans text-[7.5px] sm:text-[8px] tracking-[0.3em] uppercase text-gold font-medium">
                         {t.adminDashboard.chapterLabel} {chapter.index} · {chapter.subtitle}
                       </span>
                       <span className="px-2 py-0.5 border border-emerald-400/40 bg-emerald-500/10 text-emerald-300 text-[7px] tracking-wider uppercase">
                         {t.adminDashboard.stockAvailable}
                       </span>
                     </div>
-                    <h3 className="font-serif text-xl text-white tracking-wider mb-1">
+                    <h3 className="font-serif text-lg sm:text-xl text-white tracking-wider mb-1">
                       {chapter.title}
                     </h3>
                     <p className="font-sans text-xs text-white/50 mb-3">{chapter.details.silhouette}</p>
@@ -1362,12 +1377,12 @@ export default function LoginPage() {
                     </p>
                   </div>
 
-                  <div className="pt-4 border-t border-gold/15 flex items-center justify-between text-xs">
+                  <div className="pt-3.5 sm:pt-4 border-t border-gold/15 flex items-center justify-between text-xs">
                     <div>
                       <span className="text-gold text-xs">★ {chapter.rating.toFixed(1)}</span>
                       <span className="text-white/40 text-[9px] ml-1">({chapter.reviewCount} Reviews)</span>
                     </div>
-                    <span className="font-sans text-[8px] tracking-widest text-white/50 uppercase">
+                    <span className="font-sans text-[7.5px] sm:text-[8px] tracking-widest text-white/50 uppercase">
                       {chapter.details.sizing}
                     </span>
                   </div>
@@ -1380,12 +1395,12 @@ export default function LoginPage() {
           {/* TAB 6: SALON METRICS                                    */}
           {/* ======================================================== */}
           {adminSubTab === "metrics" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="p-6 border border-gold/20 bg-black/40">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              <div className="p-4 sm:p-6 border border-gold/20 bg-black/40">
                 <h4 className="font-serif text-lg text-white tracking-wider mb-4">
                   {t.adminDashboard.metricsTitle}
                 </h4>
-                <div className="space-y-4">
+                <div className="space-y-3.5 sm:space-y-4">
                   {[
                     { name: "The Spotlight (Emerald Gown)", pct: "42%", count: `19 ${t.adminDashboard.inquiriesCount}` },
                     { name: "The Flapper (Beaded Fringe)", pct: "26%", count: `12 ${t.adminDashboard.inquiriesCount}` },
@@ -1406,7 +1421,7 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <div className="p-6 border border-gold/20 bg-black/40 flex flex-col justify-between">
+              <div className="p-4 sm:p-6 border border-gold/20 bg-black/40 flex flex-col justify-between">
                 <div>
                   <h4 className="font-serif text-lg text-white tracking-wider mb-2">
                     {t.adminDashboard.directorshipTitle}
@@ -1447,26 +1462,26 @@ export default function LoginPage() {
       true; // All registered patrons enjoy VIP Maison status
 
     return (
-      <main className="min-h-screen bg-[#050505] text-ivory pt-24 pb-20 px-4 sm:px-8 lg:px-16 relative overflow-hidden">
+      <main className="min-h-screen bg-[#050505] text-ivory pt-20 sm:pt-24 pb-16 sm:pb-20 px-3 sm:px-8 lg:px-16 relative overflow-hidden overflow-x-clip">
         {/* Ambient gold glow */}
-        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] h-[700px] bg-gold/10 blur-[180px] pointer-events-none" />
+        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[700px] max-w-full h-[700px] bg-gold/10 blur-[180px] pointer-events-none" />
 
         <div className="max-w-5xl mx-auto relative z-10">
           {/* Top Header Bar */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-gold/20 pb-6 mb-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-gold/20 pb-5 sm:pb-6 mb-6 sm:mb-8">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-ivory/60 hover:text-gold font-sans text-[9px] tracking-[0.25em] uppercase transition-colors"
+              className="inline-flex items-center gap-2 text-ivory/60 hover:text-gold font-sans text-[8.5px] sm:text-[9px] tracking-[0.25em] uppercase transition-colors"
             >
               <ArrowLeft size={14} />
               <span>{t.auth.returnToBoutique}</span>
             </Link>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-between sm:justify-end">
               {renderLanguageSelector()}
               <button
                 onClick={logout}
-                className="px-4 py-2 border border-gold/30 hover:border-gold hover:bg-gold/10 text-white/70 hover:text-white flex items-center gap-1.5 font-sans text-[8px] tracking-[0.25em] uppercase transition-colors"
+                className="px-3 sm:px-4 py-2 border border-gold/30 hover:border-gold hover:bg-gold/10 text-white/70 hover:text-white flex items-center gap-1.5 font-sans text-[7.5px] sm:text-[8px] tracking-[0.2em] sm:tracking-[0.25em] uppercase transition-colors"
               >
                 <LogOut size={12} />
                 <span>{t.nav.logout}</span>
@@ -1475,63 +1490,63 @@ export default function LoginPage() {
           </div>
 
           {/* Member Banner Card */}
-          <div className="border border-gold/30 bg-[#0a0a0a]/90 backdrop-blur-xl p-6 sm:p-8 rounded-sm shadow-[0_20px_60px_rgba(0,0,0,0.8)] mb-8 relative overflow-hidden">
+          <div className="border border-gold/30 bg-[#0a0a0a]/90 backdrop-blur-xl p-4 sm:p-8 rounded-sm shadow-[0_20px_60px_rgba(0,0,0,0.8)] mb-6 sm:mb-8 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-gold/10 blur-2xl pointer-events-none" />
 
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-              <div className="flex items-center gap-5">
-                <div className="w-20 h-20 rounded-full border-2 border-gold/60 flex items-center justify-center font-serif text-3xl text-gold bg-gradient-to-br from-gold/20 to-black shrink-0 shadow-[0_0_25px_rgba(197,160,89,0.3)]">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5 sm:gap-6">
+              <div className="flex items-center gap-4 sm:gap-5">
+                <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-full border-2 border-gold/60 flex items-center justify-center font-serif text-2xl sm:text-3xl text-gold bg-gradient-to-br from-gold/20 to-black shrink-0 shadow-[0_0_25px_rgba(197,160,89,0.3)]">
                   {user.name.charAt(0)}
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <h1 className="font-serif text-2xl sm:text-3xl text-white tracking-wide">
+                    <h1 className="font-serif text-xl sm:text-3xl text-white tracking-wide">
                       {user.name}
                     </h1>
                     {isVip ? (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[8px] font-sans tracking-[0.25em] uppercase bg-gradient-to-r from-gold/20 via-gold/30 to-gold/20 border border-gold/60 text-gold font-semibold shadow-[0_0_12px_rgba(197,160,89,0.3)]">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[7.5px] sm:text-[8px] font-sans tracking-[0.2em] sm:tracking-[0.25em] uppercase bg-gradient-to-r from-gold/20 via-gold/30 to-gold/20 border border-gold/60 text-gold font-semibold shadow-[0_0_12px_rgba(197,160,89,0.3)]">
                         <Crown size={10} />
                         {t.profile.vipMember}
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[8px] font-sans tracking-[0.25em] uppercase border border-white/20 text-white/60">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[7.5px] sm:text-[8px] font-sans tracking-[0.2em] sm:tracking-[0.25em] uppercase border border-white/20 text-white/60">
                         {t.profile.standardMember}
                       </span>
                     )}
                   </div>
-                  <p className="font-sans text-[10px] text-gold/80 tracking-[0.25em] uppercase">
+                  <p className="font-sans text-[9px] sm:text-[10px] text-gold/80 tracking-[0.2em] sm:tracking-[0.25em] uppercase">
                     {user.membershipTier || t.auth.defaultTier}
                   </p>
-                  <p className="font-sans text-xs text-white/50 mt-1">{user.email}</p>
+                  <p className="font-sans text-[11px] sm:text-xs text-white/50 mt-1">{user.email}</p>
                 </div>
               </div>
 
               {/* Quick stats pills */}
-              <div className="grid grid-cols-3 gap-3 w-full md:w-auto text-center border-t md:border-t-0 md:border-l border-white/10 pt-4 md:pt-0 md:pl-6">
-                <div className="p-2.5 bg-white/[0.02] border border-gold/15">
-                  <span className="font-sans text-[7px] tracking-[0.25em] uppercase text-white/40 block mb-1">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 w-full md:w-auto text-center border-t md:border-t-0 md:border-l border-white/10 pt-3.5 md:pt-0 md:pl-6">
+                <div className="p-2 sm:p-2.5 bg-white/[0.02] border border-gold/15">
+                  <span className="font-sans text-[7px] tracking-[0.2em] sm:tracking-[0.25em] uppercase text-white/40 block mb-1">
                     STATUS
                   </span>
-                  <span className="font-sans text-xs text-emerald-400 font-medium">VIP Active</span>
+                  <span className="font-sans text-[11px] sm:text-xs text-emerald-400 font-medium">VIP Active</span>
                 </div>
-                <div className="p-2.5 bg-white/[0.02] border border-gold/15">
-                  <span className="font-sans text-[7px] tracking-[0.25em] uppercase text-white/40 block mb-1">
+                <div className="p-2 sm:p-2.5 bg-white/[0.02] border border-gold/15">
+                  <span className="font-sans text-[7px] tracking-[0.2em] sm:tracking-[0.25em] uppercase text-white/40 block mb-1">
                     ORDERS
                   </span>
-                  <span className="font-serif text-sm text-gold font-medium">{orderHistory.length}</span>
+                  <span className="font-serif text-xs sm:text-sm text-gold font-medium">{orderHistory.length}</span>
                 </div>
-                <div className="p-2.5 bg-white/[0.02] border border-gold/15">
-                  <span className="font-sans text-[7px] tracking-[0.25em] uppercase text-white/40 block mb-1">
+                <div className="p-2 sm:p-2.5 bg-white/[0.02] border border-gold/15">
+                  <span className="font-sans text-[7px] tracking-[0.2em] sm:tracking-[0.25em] uppercase text-white/40 block mb-1">
                     QUERIES
                   </span>
-                  <span className="font-serif text-sm text-white font-medium">{userQueries.length}</span>
+                  <span className="font-serif text-xs sm:text-sm text-white font-medium">{userQueries.length}</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* PROFILE NAVIGATION TABS */}
-          <div className="flex border-b border-gold/25 mb-8 gap-2 sm:gap-6 overflow-x-auto">
+          <div className="flex border-b border-gold/25 mb-6 sm:mb-8 gap-1.5 sm:gap-6 overflow-x-auto no-scrollbar touch-pan-x [&::-webkit-scrollbar]:hidden">
             {[
               { id: "profile", label: t.profile.tabProfile, icon: Crown },
               { id: "orders", label: `${t.profile.tabOrders} (${orderHistory.length})`, icon: Package },
@@ -1547,7 +1562,7 @@ export default function LoginPage() {
                     setClientProfileTab(tab.id as any);
                     if (tab.id === "make_query") setClientQuerySubmitted(false);
                   }}
-                  className={`py-3.5 px-3 sm:px-4 font-sans text-[9px] sm:text-[10px] tracking-[0.25em] uppercase transition-all relative flex items-center gap-2 whitespace-nowrap ${
+                  className={`py-3 sm:py-3.5 px-2.5 sm:px-4 font-sans text-[8.5px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.25em] uppercase transition-all relative flex items-center gap-1.5 sm:gap-2 whitespace-nowrap shrink-0 ${
                     isActive ? "text-gold font-semibold" : "text-white/40 hover:text-white"
                   }`}
                 >
@@ -1566,37 +1581,37 @@ export default function LoginPage() {
 
           {/* TAB 1: PROFILE DETAILS & VIP PRIVILEGES */}
           {clientProfileTab === "profile" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               {/* Patron Credentials */}
-              <div className="border border-gold/25 bg-[#0a0a0a] p-6 rounded-sm">
-                <div className="flex items-center gap-2 border-b border-gold/15 pb-3 mb-5 text-gold">
+              <div className="border border-gold/25 bg-[#0a0a0a] p-4 sm:p-6 rounded-sm">
+                <div className="flex items-center gap-2 border-b border-gold/15 pb-3 mb-4 sm:mb-5 text-gold">
                   <Sparkles size={14} />
-                  <h3 className="font-sans text-[9px] tracking-[0.3em] uppercase font-semibold">
+                  <h3 className="font-sans text-[8.5px] sm:text-[9px] tracking-[0.3em] uppercase font-semibold">
                     PATRON CREDENTIALS
                   </h3>
                 </div>
 
-                <div className="space-y-4 font-sans text-xs">
+                <div className="space-y-3.5 sm:space-y-4 font-sans text-xs">
                   <div className="flex justify-between items-center py-2 border-b border-white/5">
-                    <span className="text-white/50 uppercase text-[9px] tracking-wider">Full Name</span>
+                    <span className="text-white/50 uppercase text-[8.5px] sm:text-[9px] tracking-wider">Full Name</span>
                     <span className="text-white font-medium">{user.name}</span>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-white/5">
-                    <span className="text-white/50 uppercase text-[9px] tracking-wider">{t.profile.email}</span>
-                    <span className="text-white font-mono text-[11px]">{user.email}</span>
+                    <span className="text-white/50 uppercase text-[8.5px] sm:text-[9px] tracking-wider">{t.profile.email}</span>
+                    <span className="text-white font-mono text-[11px] truncate max-w-[180px] sm:max-w-none">{user.email}</span>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-white/5">
-                    <span className="text-white/50 uppercase text-[9px] tracking-wider">{t.profile.phone}</span>
+                    <span className="text-white/50 uppercase text-[8.5px] sm:text-[9px] tracking-wider">{t.profile.phone}</span>
                     <span className="text-white">{user.phone || t.profile.noPhone}</span>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-white/5">
-                    <span className="text-white/50 uppercase text-[9px] tracking-wider">
+                    <span className="text-white/50 uppercase text-[8.5px] sm:text-[9px] tracking-wider">
                       {t.profile.memberSince}
                     </span>
                     <span className="text-gold font-medium">{user.joinDate || "2026 Season"}</span>
                   </div>
                   <div className="flex justify-between items-center py-2">
-                    <span className="text-white/50 uppercase text-[9px] tracking-wider">VIP Tier</span>
+                    <span className="text-white/50 uppercase text-[8.5px] sm:text-[9px] tracking-wider">VIP Tier</span>
                     <span className="text-gold font-semibold tracking-wide">
                       {user.membershipTier || t.auth.defaultTier}
                     </span>
@@ -1605,47 +1620,47 @@ export default function LoginPage() {
               </div>
 
               {/* VIP Allocations & Privileges */}
-              <div className="border border-gold/25 bg-[#0a0a0a] p-6 rounded-sm flex flex-col justify-between">
+              <div className="border border-gold/25 bg-[#0a0a0a] p-4 sm:p-6 rounded-sm flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center gap-2 border-b border-gold/15 pb-3 mb-5 text-gold">
+                  <div className="flex items-center gap-2 border-b border-gold/15 pb-3 mb-4 sm:mb-5 text-gold">
                     <Crown size={14} />
-                    <h3 className="font-sans text-[9px] tracking-[0.3em] uppercase font-semibold">
+                    <h3 className="font-sans text-[8.5px] sm:text-[9px] tracking-[0.3em] uppercase font-semibold">
                       HAUTE COUTURE PRIVILEGES
                     </h3>
                   </div>
 
-                  <div className="space-y-3 font-sans text-xs mb-6">
+                  <div className="space-y-2.5 sm:space-y-3 font-sans text-xs mb-5 sm:mb-6">
                     <div className="flex justify-between items-center p-3 bg-white/[0.02] border border-white/5">
                       <span className="text-white/70">{t.auth.memberStatus}</span>
-                      <span className="text-emerald-400 font-medium text-[10px] tracking-wider uppercase">
+                      <span className="text-emerald-400 font-medium text-[9px] sm:text-[10px] tracking-wider uppercase">
                         {t.auth.activeAllocations}
                       </span>
                     </div>
                     <div className="flex justify-between items-center p-3 bg-white/[0.02] border border-white/5">
                       <span className="text-white/70">{t.auth.privateConsultation}</span>
-                      <span className="text-gold font-medium text-[10px] tracking-wider uppercase">
+                      <span className="text-gold font-medium text-[9px] sm:text-[10px] tracking-wider uppercase">
                         {t.auth.complimentaryPriority}
                       </span>
                     </div>
                     <div className="flex justify-between items-center p-3 bg-white/[0.02] border border-white/5">
                       <span className="text-white/70">{t.auth.collectionPreview}</span>
-                      <span className="text-white text-[10px] tracking-wider uppercase">
+                      <span className="text-white text-[9px] sm:text-[10px] tracking-wider uppercase">
                         {t.auth.previewSeason}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gold/15">
+                <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 pt-4 border-t border-gold/15">
                   <Link
                     href="/#collection"
-                    className="flex-1 py-3 bg-gold text-[#050505] font-sans text-[9px] tracking-[0.25em] uppercase font-semibold text-center hover:bg-[#d8b56f] transition-all"
+                    className="flex-1 py-3 bg-gold text-[#050505] font-sans text-[8.5px] sm:text-[9px] tracking-[0.25em] uppercase font-semibold text-center hover:bg-[#d8b56f] transition-all"
                   >
                     {t.auth.exploreCollectionBtn}
                   </Link>
                   <button
                     onClick={() => setClientProfileTab("make_query")}
-                    className="flex-1 py-3 border border-gold/40 text-gold font-sans text-[9px] tracking-[0.25em] uppercase text-center hover:bg-gold/10 transition-colors"
+                    className="flex-1 py-3 border border-gold/40 text-gold font-sans text-[8.5px] sm:text-[9px] tracking-[0.25em] uppercase text-center hover:bg-gold/10 transition-colors"
                   >
                     {t.profile.tabMakeQuery}
                   </button>
@@ -1656,17 +1671,17 @@ export default function LoginPage() {
 
           {/* TAB 2: ORDER HISTORY */}
           {clientProfileTab === "orders" && (
-            <div className="border border-gold/25 bg-[#0a0a0a] rounded-sm p-6">
-              <div className="flex items-center justify-between border-b border-gold/15 pb-4 mb-6">
+            <div className="border border-gold/25 bg-[#0a0a0a] rounded-sm p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gold/15 pb-4 mb-4 sm:mb-6">
                 <div>
-                  <h3 className="font-serif text-xl text-white tracking-wide">
+                  <h3 className="font-serif text-lg sm:text-xl text-white tracking-wide">
                     {t.profile.tabOrders}
                   </h3>
-                  <p className="font-sans text-[10px] text-white/40 uppercase tracking-widest mt-0.5">
+                  <p className="font-sans text-[9px] sm:text-[10px] text-white/40 uppercase tracking-widest mt-0.5">
                     Maison Aurelle Haute Couture Acquisitions
                   </p>
                 </div>
-                <span className="font-sans text-[9px] text-gold tracking-widest uppercase">
+                <span className="font-sans text-[8px] sm:text-[9px] text-gold tracking-widest uppercase self-start sm:self-auto">
                   {orderHistory.length} Recorded Orders
                 </span>
               </div>
@@ -1686,14 +1701,14 @@ export default function LoginPage() {
                     return (
                       <div
                         key={order.id}
-                        className="py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/[0.015] px-2 transition-colors"
+                        className="py-4 sm:py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 hover:bg-white/[0.015] px-1 sm:px-2 transition-colors"
                       >
-                        <div className="flex items-start gap-4">
-                          <div className="w-12 h-12 bg-gold/10 border border-gold/30 rounded-sm flex items-center justify-center shrink-0">
-                            <Package size={20} className="text-gold" />
+                        <div className="flex items-start gap-3 sm:gap-4">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gold/10 border border-gold/30 rounded-sm flex items-center justify-center shrink-0">
+                            <Package size={18} className="text-gold sm:w-5 sm:h-5" />
                           </div>
                           <div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <h4 className="font-serif text-base text-white tracking-wide">
                                 {order.item}
                               </h4>
@@ -1701,19 +1716,19 @@ export default function LoginPage() {
                             </div>
                             <p className="font-sans text-xs text-white/60">{order.subtitle}</p>
                             <div className="flex items-center gap-3 mt-1.5 flex-wrap">
-                              <span className="font-sans text-[9px] text-white/40 uppercase tracking-wider">
+                              <span className="font-sans text-[8px] sm:text-[9px] text-white/40 uppercase tracking-wider">
                                 {order.date}
                               </span>
                               {order.trackingNumber && (
                                 <span className="text-sky-300 font-mono text-[10px] flex items-center gap-1">
-                                  <Truck size={11} /> {order.trackingNumber}
+                                  <Truck size={11} className="shrink-0" /> {order.trackingNumber}
                                 </span>
                               )}
                             </div>
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between sm:justify-end gap-6 self-end sm:self-center">
+                        <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-6 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
                           <span className="font-serif text-base text-gold font-medium">
                             {order.price}
                           </span>
@@ -1752,19 +1767,19 @@ export default function LoginPage() {
 
           {/* TAB 3: MY QUERIES (QUESTIONS & ADMIN REPLIES) */}
           {clientProfileTab === "queries" && (
-            <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gold/20 pb-4">
+            <div className="space-y-5 sm:space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gold/20 pb-4">
                 <div>
-                  <h3 className="font-serif text-xl text-white tracking-wide">
+                  <h3 className="font-serif text-lg sm:text-xl text-white tracking-wide">
                     {t.profile.tabQueries}
                   </h3>
-                  <p className="font-sans text-[10px] text-white/40 uppercase tracking-widest mt-0.5">
+                  <p className="font-sans text-[9px] sm:text-[10px] text-white/40 uppercase tracking-widest mt-0.5">
                     Direct communications with the Maison Atelier Directorate
                   </p>
                 </div>
                 <button
                   onClick={() => setClientProfileTab("make_query")}
-                  className="px-4 py-2 bg-gradient-to-r from-gold via-champagne to-gold text-[#050505] font-sans text-[8px] tracking-[0.25em] uppercase font-semibold hover:opacity-90 transition-opacity self-start sm:self-auto"
+                  className="px-4 py-2 bg-gradient-to-r from-gold via-champagne to-gold text-[#050505] font-sans text-[7.5px] sm:text-[8px] tracking-[0.25em] uppercase font-semibold hover:opacity-90 transition-opacity self-stretch sm:self-auto text-center"
                 >
                   + {t.profile.tabMakeQuery}
                 </button>
@@ -1789,13 +1804,13 @@ export default function LoginPage() {
                   {userQueries.map((query) => (
                     <div
                       key={query.id}
-                      className="border border-gold/25 bg-[#0a0a0a] p-6 rounded-sm shadow-[0_10px_30px_rgba(0,0,0,0.6)]"
+                      className="border border-gold/25 bg-[#0a0a0a] p-4 sm:p-6 rounded-sm shadow-[0_10px_30px_rgba(0,0,0,0.6)]"
                     >
                       {/* Query Header */}
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3 mb-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3 mb-3.5 sm:mb-4">
                         <div>
                           <div className="flex items-center gap-2">
-                            <h4 className="font-serif text-lg text-white font-medium">
+                            <h4 className="font-serif text-base sm:text-lg text-white font-medium">
                               {query.subject}
                             </h4>
                           </div>
@@ -1804,7 +1819,7 @@ export default function LoginPage() {
                           </span>
                         </div>
 
-                        <div>
+                        <div className="self-start sm:self-auto">
                           <span
                             className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[8px] font-sans tracking-[0.2em] uppercase border font-semibold ${
                               query.status === "Replied"
@@ -1823,7 +1838,7 @@ export default function LoginPage() {
                       </div>
 
                       {/* Client's Message */}
-                      <div className="mb-4 bg-white/[0.02] p-4 rounded-sm border-l-2 border-white/20">
+                      <div className="mb-4 bg-white/[0.02] p-3.5 sm:p-4 rounded-sm border-l-2 border-white/20">
                         <p className="font-sans text-xs text-white/80 leading-relaxed">
                           {query.message}
                         </p>
@@ -1831,16 +1846,16 @@ export default function LoginPage() {
 
                       {/* Admin Atelier Reply (if present) */}
                       {query.adminReply ? (
-                        <div className="mt-4 bg-gradient-to-r from-gold/15 via-gold/10 to-transparent border border-gold/40 p-4 rounded-sm relative">
+                        <div className="mt-4 bg-gradient-to-r from-gold/15 via-gold/10 to-transparent border border-gold/40 p-3.5 sm:p-4 rounded-sm relative">
                           <div className="flex items-center justify-between mb-2">
-                            <div className="flex items-center gap-2 text-gold">
-                              <Crown size={13} />
-                              <span className="font-sans text-[9px] tracking-[0.25em] uppercase font-semibold">
+                            <div className="flex items-center gap-1.5 sm:gap-2 text-gold">
+                              <Crown size={13} className="shrink-0" />
+                              <span className="font-sans text-[8.5px] sm:text-[9px] tracking-[0.2em] sm:tracking-[0.25em] uppercase font-semibold">
                                 {t.profile.adminReply} · Store Director
                               </span>
                             </div>
                             {query.adminReplyDate && (
-                              <span className="font-sans text-[8px] text-white/40 uppercase tracking-widest">
+                              <span className="font-sans text-[7.5px] sm:text-[8px] text-white/40 uppercase tracking-widest">
                                 {query.adminReplyDate}
                               </span>
                             )}
@@ -1850,8 +1865,8 @@ export default function LoginPage() {
                           </p>
                         </div>
                       ) : (
-                        <div className="flex items-center gap-2 text-amber-300/80 font-sans text-[9px] uppercase tracking-wider pt-2">
-                          <Clock size={12} className="animate-pulse" />
+                        <div className="flex items-center gap-2 text-amber-300/80 font-sans text-[8.5px] sm:text-[9px] uppercase tracking-wider pt-2">
+                          <Clock size={12} className="animate-pulse shrink-0" />
                           <span>Awaiting response from Store Director (Typically within 24 hours)</span>
                         </div>
                       )}
@@ -1864,18 +1879,18 @@ export default function LoginPage() {
 
           {/* TAB 4: MAKE A QUERY FORM */}
           {clientProfileTab === "make_query" && (
-            <div className="max-w-2xl mx-auto border border-gold/30 bg-[#0a0a0a] p-6 sm:p-8 rounded-sm shadow-[0_20px_60px_rgba(0,0,0,0.85)]">
-              <div className="border-b border-gold/20 pb-4 mb-6">
+            <div className="max-w-2xl mx-auto border border-gold/30 bg-[#0a0a0a] p-5 sm:p-8 rounded-sm shadow-[0_20px_60px_rgba(0,0,0,0.85)]">
+              <div className="border-b border-gold/20 pb-4 mb-5 sm:mb-6">
                 <div className="flex items-center gap-2 text-gold mb-1">
                   <MessageSquare size={16} />
-                  <span className="font-sans text-[9px] tracking-[0.35em] uppercase font-semibold">
+                  <span className="font-sans text-[8.5px] sm:text-[9px] tracking-[0.3em] sm:tracking-[0.35em] uppercase font-semibold">
                     DIRECT CLIENT CONCIERGE
                   </span>
                 </div>
-                <h3 className="font-serif text-2xl text-white tracking-wide">
+                <h3 className="font-serif text-xl sm:text-2xl text-white tracking-wide">
                   {t.profile.tabMakeQuery}
                 </h3>
-                <p className="font-sans text-xs text-white/50 mt-1">
+                <p className="font-sans text-[11px] sm:text-xs text-white/50 mt-1">
                   Submit inquiries directly to our Paris atelier stylists and executive directorship.
                 </p>
               </div>
@@ -1905,15 +1920,15 @@ export default function LoginPage() {
                   </div>
                 </div>
               ) : (
-                <form onSubmit={handleClientSubmitQuery} className="space-y-5">
+                <form onSubmit={handleClientSubmitQuery} className="space-y-4 sm:space-y-5">
                   <div>
-                    <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/50 mb-2">
+                    <label className="block font-sans text-[7.5px] sm:text-[8px] tracking-[0.25em] uppercase text-white/50 mb-2">
                       {t.profile.querySubject}
                     </label>
                     <select
                       value={clientQuerySubject}
                       onChange={(e) => setClientQuerySubject(e.target.value)}
-                      className="w-full bg-black/60 border border-gold/30 px-4 py-3 font-sans text-xs text-white outline-none focus:border-gold transition-colors"
+                      className="w-full bg-black/60 border border-gold/30 px-3.5 sm:px-4 py-2.5 sm:py-3 font-sans text-xs text-white outline-none focus:border-gold transition-colors"
                     >
                       {t.profile.subjectOptions.map((opt) => (
                         <option key={opt} value={opt} className="bg-black text-white">
@@ -1924,7 +1939,7 @@ export default function LoginPage() {
                   </div>
 
                   <div>
-                    <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/50 mb-2">
+                    <label className="block font-sans text-[7.5px] sm:text-[8px] tracking-[0.25em] uppercase text-white/50 mb-2">
                       {t.profile.queryMessage}
                     </label>
                     <textarea
@@ -1933,14 +1948,14 @@ export default function LoginPage() {
                       value={clientQueryMessage}
                       onChange={(e) => setClientQueryMessage(e.target.value)}
                       placeholder={t.profile.queryMessagePlaceholder}
-                      className="w-full bg-black/60 border border-gold/30 px-4 py-3 font-sans text-xs text-white placeholder:text-white/20 outline-none focus:border-gold transition-colors leading-relaxed"
+                      className="w-full bg-black/60 border border-gold/30 px-3.5 sm:px-4 py-2.5 sm:py-3 font-sans text-xs text-white placeholder:text-white/20 outline-none focus:border-gold transition-colors leading-relaxed"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={clientQueryLoading || !clientQueryMessage.trim()}
-                    className="w-full py-4 bg-gradient-to-r from-gold via-champagne to-gold text-[#050505] font-sans text-[9px] tracking-[0.35em] uppercase font-semibold hover:opacity-90 disabled:opacity-40 transition-all flex items-center justify-center gap-2"
+                    className="w-full py-3.5 sm:py-4 bg-gradient-to-r from-gold via-champagne to-gold text-[#050505] font-sans text-[8.5px] sm:text-[9px] tracking-[0.3em] sm:tracking-[0.35em] uppercase font-semibold hover:opacity-90 disabled:opacity-40 transition-all flex items-center justify-center gap-2"
                   >
                     {clientQueryLoading ? (
                       <span>{t.profile.querySubmitting}</span>
@@ -1964,22 +1979,22 @@ export default function LoginPage() {
   // VIEW 3: GUEST 3-IN-1 LUXURY PORTAL (LOGIN, SIGNUP, ADMIN)
   // ========================================================
   return (
-    <main className="min-h-screen bg-[#050505] text-ivory flex flex-col justify-between pt-24 pb-12 px-4 sm:px-6 relative overflow-hidden">
+    <main className="min-h-screen bg-[#050505] text-ivory flex flex-col justify-between pt-20 sm:pt-24 pb-8 sm:pb-12 px-3 sm:px-6 relative overflow-hidden overflow-x-clip">
       {/* Background ambient lighting */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gold/10 blur-[150px] pointer-events-none" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] max-w-full h-[600px] rounded-full bg-gold/10 blur-[150px] pointer-events-none" />
 
       {/* Top Bar with Return Link */}
-      <div className="max-w-4xl mx-auto w-full flex items-center justify-between mb-8 z-10">
+      <div className="max-w-4xl mx-auto w-full flex items-center justify-between mb-6 sm:mb-8 z-10 gap-3">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-ivory/60 hover:text-gold font-sans text-[9px] tracking-[0.25em] uppercase transition-colors"
+          className="inline-flex items-center gap-2 text-ivory/60 hover:text-gold font-sans text-[8.5px] sm:text-[9px] tracking-[0.2em] sm:tracking-[0.25em] uppercase transition-colors"
         >
           <ArrowLeft size={14} />
           <span>{t.auth.returnToBoutique}</span>
         </Link>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
           {renderLanguageSelector()}
-          <span className="font-serif text-lg tracking-widest text-gold font-medium">
+          <span className="font-serif text-base sm:text-lg tracking-widest text-gold font-medium">
             AURELLE
           </span>
         </div>
@@ -1987,26 +2002,26 @@ export default function LoginPage() {
 
       {/* Center Auth Card */}
       <div className="max-w-lg mx-auto w-full z-10">
-        <div className="border border-gold/30 bg-[#0a0a0a]/90 backdrop-blur-xl p-8 sm:p-10 rounded-sm shadow-[0_20px_60px_rgba(0,0,0,0.8)] relative">
+        <div className="border border-gold/30 bg-[#0a0a0a]/90 backdrop-blur-xl p-5 sm:p-10 rounded-sm shadow-[0_20px_60px_rgba(0,0,0,0.8)] relative">
           {/* Header */}
-          <div className="text-center mb-8">
-            <span className="font-sans text-[9px] tracking-[0.35em] uppercase text-gold/80 font-medium block mb-2">
+          <div className="text-center mb-6 sm:mb-8">
+            <span className="font-sans text-[8px] sm:text-[9px] tracking-[0.3em] sm:tracking-[0.35em] uppercase text-gold/80 font-medium block mb-1.5 sm:mb-2">
               MAISON AURELLE · PRIVATE ATELIER
             </span>
-            <h1 className="font-serif text-3xl sm:text-4xl text-white tracking-wider">
+            <h1 className="font-serif text-2xl sm:text-4xl text-white tracking-wider">
               {t.auth.loginTitle}
             </h1>
-            <p className="font-sans text-xs text-white/50 mt-2 font-light">
+            <p className="font-sans text-[11px] sm:text-xs text-white/50 mt-1.5 sm:mt-2 font-light">
               {t.auth.loginSubtitle}
             </p>
           </div>
 
           {/* 3 Portal Selection Tabs */}
-          <div className="grid grid-cols-3 border border-gold/30 p-1 mb-8 bg-black/40">
+          <div className="grid grid-cols-3 border border-gold/30 p-1 mb-6 sm:mb-8 bg-black/40">
             <button
               type="button"
               onClick={() => setActiveTab("login")}
-              className={`py-2.5 font-sans text-[8px] sm:text-[9px] tracking-[0.25em] uppercase transition-all ${
+              className={`py-2 sm:py-2.5 font-sans text-[7.5px] sm:text-[9px] tracking-[0.15em] sm:tracking-[0.25em] uppercase transition-all ${
                 activeTab === "login"
                   ? "bg-gold text-[#050505] font-semibold shadow-sm"
                   : "text-white/60 hover:text-white"
@@ -2017,7 +2032,7 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => setActiveTab("signup")}
-              className={`py-2.5 font-sans text-[8px] sm:text-[9px] tracking-[0.25em] uppercase transition-all ${
+              className={`py-2 sm:py-2.5 font-sans text-[7.5px] sm:text-[9px] tracking-[0.15em] sm:tracking-[0.25em] uppercase transition-all ${
                 activeTab === "signup"
                   ? "bg-gold text-[#050505] font-semibold shadow-sm"
                   : "text-white/60 hover:text-white"
@@ -2028,7 +2043,7 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => setActiveTab("admin")}
-              className={`py-2.5 font-sans text-[8px] sm:text-[9px] tracking-[0.25em] uppercase transition-all ${
+              className={`py-2 sm:py-2.5 font-sans text-[7.5px] sm:text-[9px] tracking-[0.15em] sm:tracking-[0.25em] uppercase transition-all ${
                 activeTab === "admin"
                   ? "bg-gold text-[#050505] font-semibold shadow-sm"
                   : "text-white/60 hover:text-white"
@@ -2045,9 +2060,9 @@ export default function LoginPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <form onSubmit={handleClientLogin} className="space-y-5">
+              <form onSubmit={handleClientLogin} className="space-y-4 sm:space-y-5">
                 <div>
-                  <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/60 mb-2">
+                  <label className="block font-sans text-[7.5px] sm:text-[8px] tracking-[0.25em] uppercase text-white/60 mb-1.5 sm:mb-2">
                     {t.auth.emailLabel}
                   </label>
                   <div className="relative">
@@ -2057,14 +2072,14 @@ export default function LoginPage() {
                       value={loginEmail}
                       onChange={(e) => setLoginEmail(e.target.value)}
                       placeholder={t.auth.emailPlaceholder}
-                      className="w-full bg-black/60 border border-gold/30 rounded-none px-4 py-3 font-sans text-xs text-white placeholder:text-white/20 outline-none focus:border-gold transition-colors"
+                      className="w-full bg-black/60 border border-gold/30 rounded-none px-3.5 sm:px-4 py-2.5 sm:py-3 font-sans text-xs text-white placeholder:text-white/20 outline-none focus:border-gold transition-colors"
                     />
                     <Mail size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30" />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/60 mb-2">
+                  <label className="block font-sans text-[7.5px] sm:text-[8px] tracking-[0.25em] uppercase text-white/60 mb-1.5 sm:mb-2">
                     {t.auth.passwordLabel}
                   </label>
                   <div className="relative">
@@ -2074,7 +2089,7 @@ export default function LoginPage() {
                       value={loginPassword}
                       onChange={(e) => setLoginPassword(e.target.value)}
                       placeholder={t.auth.passwordPlaceholder}
-                      className="w-full bg-black/60 border border-gold/30 rounded-none px-4 py-3 font-sans text-xs text-white placeholder:text-white/20 outline-none focus:border-gold transition-colors"
+                      className="w-full bg-black/60 border border-gold/30 rounded-none px-3.5 sm:px-4 py-2.5 sm:py-3 font-sans text-xs text-white placeholder:text-white/20 outline-none focus:border-gold transition-colors"
                     />
                     <button
                       type="button"
@@ -2095,21 +2110,21 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={loginLoading}
-                  className="w-full py-4 bg-gradient-to-r from-gold via-champagne to-gold text-[#050505] font-sans text-[9px] tracking-[0.35em] uppercase font-semibold transition-all hover:opacity-90 disabled:opacity-50"
+                  className="w-full py-3.5 sm:py-4 bg-gradient-to-r from-gold via-champagne to-gold text-[#050505] font-sans text-[8.5px] sm:text-[9px] tracking-[0.3em] sm:tracking-[0.35em] uppercase font-semibold transition-all hover:opacity-90 disabled:opacity-50"
                 >
                   {loginLoading ? t.auth.authenticating : t.auth.btnSignIn}
                 </button>
               </form>
 
               {/* Demo Helper Button */}
-              <div className="mt-6 pt-5 border-t border-white/10 text-center">
-                <span className="font-sans text-[8px] tracking-[0.25em] uppercase text-white/40 block mb-2">
+              <div className="mt-5 sm:mt-6 pt-4 sm:pt-5 border-t border-white/10 text-center">
+                <span className="font-sans text-[7.5px] sm:text-[8px] tracking-[0.2em] sm:tracking-[0.25em] uppercase text-white/40 block mb-2">
                   {t.auth.demoHint}
                 </span>
                 <button
                   type="button"
                   onClick={handleFillClientDemo}
-                  className="px-3.5 py-1.5 border border-gold/30 hover:border-gold font-sans text-[8px] tracking-widest uppercase text-gold bg-gold/5 transition-colors"
+                  className="px-3.5 py-1.5 border border-gold/30 hover:border-gold font-sans text-[7.5px] sm:text-[8px] tracking-widest uppercase text-gold bg-gold/5 transition-colors"
                 >
                   {t.auth.demoClientBtn}
                 </button>
@@ -2124,9 +2139,9 @@ export default function LoginPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <form onSubmit={handleClientSignup} className="space-y-4">
+              <form onSubmit={handleClientSignup} className="space-y-3.5 sm:space-y-4">
                 <div>
-                  <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/60 mb-1.5">
+                  <label className="block font-sans text-[7.5px] sm:text-[8px] tracking-[0.25em] uppercase text-white/60 mb-1.5">
                     {t.auth.fullNameLabel}
                   </label>
                   <div className="relative">
@@ -2136,14 +2151,14 @@ export default function LoginPage() {
                       value={signupName}
                       onChange={(e) => setSignupName(e.target.value)}
                       placeholder={t.auth.fullNamePlaceholder}
-                      className="w-full bg-black/60 border border-gold/30 rounded-none px-4 py-2.5 font-sans text-xs text-white placeholder:text-white/20 outline-none focus:border-gold transition-colors"
+                      className="w-full bg-black/60 border border-gold/30 rounded-none px-3.5 sm:px-4 py-2.5 font-sans text-xs text-white placeholder:text-white/20 outline-none focus:border-gold transition-colors"
                     />
                     <UserIcon size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30" />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/60 mb-1.5">
+                  <label className="block font-sans text-[7.5px] sm:text-[8px] tracking-[0.25em] uppercase text-white/60 mb-1.5">
                     {t.auth.emailLabel}
                   </label>
                   <div className="relative">
@@ -2153,14 +2168,14 @@ export default function LoginPage() {
                       value={signupEmail}
                       onChange={(e) => setSignupEmail(e.target.value)}
                       placeholder={t.auth.emailPlaceholder}
-                      className="w-full bg-black/60 border border-gold/30 rounded-none px-4 py-2.5 font-sans text-xs text-white placeholder:text-white/20 outline-none focus:border-gold transition-colors"
+                      className="w-full bg-black/60 border border-gold/30 rounded-none px-3.5 sm:px-4 py-2.5 font-sans text-xs text-white placeholder:text-white/20 outline-none focus:border-gold transition-colors"
                     />
                     <Mail size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30" />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/60 mb-1.5">
+                  <label className="block font-sans text-[7.5px] sm:text-[8px] tracking-[0.25em] uppercase text-white/60 mb-1.5">
                     {t.auth.phoneLabel}
                   </label>
                   <div className="relative">
@@ -2169,20 +2184,20 @@ export default function LoginPage() {
                       value={signupPhone}
                       onChange={(e) => setSignupPhone(e.target.value)}
                       placeholder={t.auth.phonePlaceholder}
-                      className="w-full bg-black/60 border border-gold/30 rounded-none px-4 py-2.5 font-sans text-xs text-white placeholder:text-white/20 outline-none focus:border-gold transition-colors"
+                      className="w-full bg-black/60 border border-gold/30 rounded-none px-3.5 sm:px-4 py-2.5 font-sans text-xs text-white placeholder:text-white/20 outline-none focus:border-gold transition-colors"
                     />
                     <Phone size={14} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/30" />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/60 mb-1.5">
+                  <label className="block font-sans text-[7.5px] sm:text-[8px] tracking-[0.25em] uppercase text-white/60 mb-1.5">
                     {t.auth.interestLabel}
                   </label>
                   <select
                     value={signupInterest}
                     onChange={(e) => setSignupInterest(e.target.value)}
-                    className="w-full bg-black/60 border border-gold/30 rounded-none px-4 py-2.5 font-sans text-xs text-white outline-none focus:border-gold transition-colors"
+                    className="w-full bg-black/60 border border-gold/30 rounded-none px-3.5 sm:px-4 py-2.5 font-sans text-xs text-white outline-none focus:border-gold transition-colors"
                   >
                     <option value="Haute Couture Circle" className="bg-black text-white">
                       {t.auth.interestGala}
@@ -2199,9 +2214,9 @@ export default function LoginPage() {
                   </select>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/60 mb-1.5">
+                    <label className="block font-sans text-[7.5px] sm:text-[8px] tracking-[0.25em] uppercase text-white/60 mb-1.5">
                       {t.auth.passwordLabel}
                     </label>
                     <input
@@ -2214,7 +2229,7 @@ export default function LoginPage() {
                     />
                   </div>
                   <div>
-                    <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/60 mb-1.5">
+                    <label className="block font-sans text-[7.5px] sm:text-[8px] tracking-[0.25em] uppercase text-white/60 mb-1.5">
                       {t.auth.confirmPasswordLabel}
                     </label>
                     <input
@@ -2237,7 +2252,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={signupLoading}
-                  className="w-full py-4 bg-gradient-to-r from-gold via-champagne to-gold text-[#050505] font-sans text-[9px] tracking-[0.35em] uppercase font-semibold transition-all hover:opacity-90 disabled:opacity-50 mt-2"
+                  className="w-full py-3.5 sm:py-4 bg-gradient-to-r from-gold via-champagne to-gold text-[#050505] font-sans text-[8.5px] sm:text-[9px] tracking-[0.3em] sm:tracking-[0.35em] uppercase font-semibold transition-all hover:opacity-90 disabled:opacity-50 mt-2"
                 >
                   {signupLoading ? t.auth.creatingAccount : t.auth.btnCreateAccount}
                 </button>
@@ -2252,21 +2267,21 @@ export default function LoginPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="mb-6 p-3 bg-gold/10 border border-gold/30 text-center">
+              <div className="mb-5 sm:mb-6 p-3 bg-gold/10 border border-gold/30 text-center">
                 <div className="flex items-center justify-center gap-1.5 text-gold mb-1">
                   <ShieldCheck size={14} />
-                  <span className="font-sans text-[8px] tracking-[0.3em] uppercase font-semibold">
+                  <span className="font-sans text-[7.5px] sm:text-[8px] tracking-[0.3em] uppercase font-semibold">
                     {t.auth.adminTitle}
                   </span>
                 </div>
-                <p className="font-sans text-[10px] text-white/60 font-light">
+                <p className="font-sans text-[9px] sm:text-[10px] text-white/60 font-light">
                   {t.auth.adminSubtitle}
                 </p>
               </div>
 
-              <form onSubmit={handleAdminSignIn} className="space-y-5">
+              <form onSubmit={handleAdminSignIn} className="space-y-4 sm:space-y-5">
                 <div>
-                  <label className="block font-sans text-[8px] tracking-[0.25em] uppercase text-white/60 mb-2">
+                  <label className="block font-sans text-[7.5px] sm:text-[8px] tracking-[0.25em] uppercase text-white/60 mb-1.5 sm:mb-2">
                     {t.auth.adminKeyLabel}
                   </label>
                   <div className="relative">
@@ -2276,7 +2291,7 @@ export default function LoginPage() {
                       value={adminPasscode}
                       onChange={(e) => setAdminPasscode(e.target.value)}
                       placeholder={t.auth.adminKeyPlaceholder}
-                      className="w-full bg-black/60 border border-gold/30 rounded-none px-4 py-3 font-mono text-xs text-white placeholder:text-white/20 outline-none focus:border-gold transition-colors"
+                      className="w-full bg-black/60 border border-gold/30 rounded-none px-3.5 sm:px-4 py-2.5 sm:py-3 font-mono text-xs text-white placeholder:text-white/20 outline-none focus:border-gold transition-colors"
                     />
                     <button
                       type="button"
@@ -2297,21 +2312,21 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={adminLoading}
-                  className="w-full py-4 bg-gradient-to-r from-gold via-champagne to-gold text-[#050505] font-sans text-[9px] tracking-[0.35em] uppercase font-semibold transition-all hover:opacity-90 disabled:opacity-50"
+                  className="w-full py-3.5 sm:py-4 bg-gradient-to-r from-gold via-champagne to-gold text-[#050505] font-sans text-[8.5px] sm:text-[9px] tracking-[0.3em] sm:tracking-[0.35em] uppercase font-semibold transition-all hover:opacity-90 disabled:opacity-50"
                 >
                   {adminLoading ? t.auth.verifyingAccess : t.auth.btnAdminSignIn}
                 </button>
               </form>
 
               {/* Demo Helper Button */}
-              <div className="mt-6 pt-5 border-t border-white/10 text-center">
-                <span className="font-sans text-[8px] tracking-[0.25em] uppercase text-white/40 block mb-2">
+              <div className="mt-5 sm:mt-6 pt-4 sm:pt-5 border-t border-white/10 text-center">
+                <span className="font-sans text-[7.5px] sm:text-[8px] tracking-[0.2em] sm:tracking-[0.25em] uppercase text-white/40 block mb-2">
                   {t.auth.demoHint}
                 </span>
                 <button
                   type="button"
                   onClick={handleFillAdminDemo}
-                  className="px-3.5 py-1.5 border border-gold/30 hover:border-gold font-sans text-[8px] tracking-widest uppercase text-gold bg-gold/5 transition-colors"
+                  className="px-3.5 py-1.5 border border-gold/30 hover:border-gold font-sans text-[7.5px] sm:text-[8px] tracking-widest uppercase text-gold bg-gold/5 transition-colors"
                 >
                   {t.auth.demoAdminBtn}
                 </button>
@@ -2322,7 +2337,7 @@ export default function LoginPage() {
       </div>
 
       {/* Footer Notice */}
-      <div className="text-center font-sans text-[8px] tracking-[0.3em] uppercase text-white/30 mt-8 z-10">
+      <div className="text-center font-sans text-[7.5px] sm:text-[8px] tracking-[0.25em] sm:tracking-[0.3em] uppercase text-white/30 mt-6 sm:mt-8 z-10 px-2">
         {t.auth.footerNotice}
       </div>
     </main>
