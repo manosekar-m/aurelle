@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/context/AuthContext";
 
 interface Props {
   isOpen: boolean;
@@ -21,6 +22,7 @@ const ENQUIRY_TYPES = [
 ];
 
 export default function EnquiryForm({ isOpen, onClose, lookTitle, lookSubtitle, accent }: Props) {
+  const { addEnquiry } = useAuth();
   const [submitted, setSubmitted] = useState(false);
   const [form, setForm] = useState({
     name: "",
@@ -43,6 +45,14 @@ export default function EnquiryForm({ isOpen, onClose, lookTitle, lookSubtitle, 
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
+    addEnquiry({
+      name: form.name.trim(),
+      mobile: form.mobile.trim(),
+      enquiryType: form.enquiryType,
+      detail: form.detail.trim(),
+      lookTitle,
+      lookSubtitle,
+    });
     setSubmitted(true);
   };
 

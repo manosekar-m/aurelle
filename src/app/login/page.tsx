@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -37,10 +37,14 @@ import {
   Activity,
   DollarSign,
   Layers,
+  Bookmark,
+  X,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { collection } from "@/data/collection";
+import OrderModal from "@/components/sections/OrderModal";
+import { getGarmentPrice } from "@/components/sections/OrderModal";
 
 interface RevenuePoint {
   month: string;
@@ -81,6 +85,8 @@ export default function LoginPage() {
     orders,
     orderHistory,
     updateOrderStatus,
+    watchlist,
+    removeFromWatchlist,
   } = useAuth();
   const { t, language, setLanguage, languages } = useLanguage();
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
@@ -98,11 +104,28 @@ export default function LoginPage() {
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
 
   // Client Profile state
-  const [clientProfileTab, setClientProfileTab] = useState<"profile" | "orders" | "queries" | "make_query">("profile");
+  const [clientProfileTab, setClientProfileTab] = useState<"profile" | "orders" | "queries" | "make_query" | "watchlist">("profile");
   const [clientQuerySubject, setClientQuerySubject] = useState(t.profile.subjectOptions[0] || "International Shipping Enquiry");
   const [clientQueryMessage, setClientQueryMessage] = useState("");
   const [clientQuerySubmitted, setClientQuerySubmitted] = useState(false);
   const [clientQueryLoading, setClientQueryLoading] = useState(false);
+
+  // Watchlist ordering
+  const [watchlistOrderLook, setWatchlistOrderLook] = useState<{ id: string; title: string; subtitle: string; price?: string; imagePrimary?: string } | null>(null);
+  const [watchlistOrderModalOpen, setWatchlistOrderModalOpen] = useState(false);
+
+  // Read ?tab= from URL to deep-link
+  const searchParamsRef = useRef<URLSearchParams | null>(null);
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const sp = new URLSearchParams(window.location.search);
+      searchParamsRef.current = sp;
+      const tabParam = sp.get("tab");
+      if (tabParam === "orders") setClientProfileTab("orders");
+      else if (tabParam === "watchlist") setClientProfileTab("watchlist");
+      else if (tabParam === "queries") setClientProfileTab("queries");
+    }
+  }, []);
 
   // Admin reply drafts
   const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
@@ -1522,7 +1545,7 @@ export default function LoginPage() {
               </div>
 
               {/* Quick stats pills */}
-              <div className="grid grid-cols-3 gap-2 sm:gap-3 w-full md:w-auto text-center border-t md:border-t-0 md:border-l border-white/10 pt-3.5 md:pt-0 md:pl-6">
+              <div className="grid grid-cols-4 gap-2 sm:gap-3 w-full md:w-auto text-center border-t md:border-t-0 md:border-l border-white/10 pt-3.5 md:pt-0 md:pl-6">
                 <div className="p-2 sm:p-2.5 bg-white/[0.02] border border-gold/15">
                   <span className="font-sans text-[7px] tracking-[0.2em] sm:tracking-[0.25em] uppercase text-white/40 block mb-1">
                     STATUS
@@ -1534,6 +1557,12 @@ export default function LoginPage() {
                     ORDERS
                   </span>
                   <span className="font-serif text-xs sm:text-sm text-gold font-medium">{orderHistory.length}</span>
+                </div>
+                <div className="p-2 sm:p-2.5 bg-white/[0.02] border border-gold/15">
+                  <span className="font-sans text-[7px] tracking-[0.2em] sm:tracking-[0.25em] uppercase text-white/40 block mb-1">
+                    WATCHLIST
+                  </span>
+                  <span className="font-serif text-xs sm:text-sm text-gold font-medium">{watchlist.length}</span>
                 </div>
                 <div className="p-2 sm:p-2.5 bg-white/[0.02] border border-gold/15">
                   <span className="font-sans text-[7px] tracking-[0.2em] sm:tracking-[0.25em] uppercase text-white/40 block mb-1">
@@ -1550,6 +1579,7 @@ export default function LoginPage() {
             {[
               { id: "profile", label: t.profile.tabProfile, icon: Crown },
               { id: "orders", label: `${t.profile.tabOrders} (${orderHistory.length})`, icon: Package },
+              { id: "watchlist", label: `MY WATCHLIST (${watchlist.length})`, icon: Bookmark },
               { id: "queries", label: `${t.profile.tabQueries} (${userQueries.length})`, icon: MessageSquare },
               { id: "make_query", label: t.profile.tabMakeQuery, icon: Send },
             ].map((tab) => {
@@ -1876,6 +1906,119 @@ export default function LoginPage() {
               )}
             </div>
           )}
+
+          {/* TAB WATCHLIST: SAVED LOOKS */}
+          {clientProfileTab === "watchlist" && (
+            <div className="border border-gold/25 bg-[#0a0a0a] rounded-sm p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gold/15 pb-4 mb-6">
+                <div>
+                  <h3 className="font-serif text-lg sm:text-xl text-white tracking-wide flex items-center gap-2">
+                    <Bookmark size={18} className="text-gold" />
+                    My Atelier Watchlist
+                  </h3>
+                  <p className="font-sans text-[9px] sm:text-[10px] text-white/40 uppercase tracking-widest mt-1">
+                    Saved garments from the Maison Aurelle collection
+                  </p>
+                </div>
+                {watchlist.length > 0 && (
+                  <span className="font-sans text-[8px] tracking-[0.2em] uppercase text-gold border border-gold/30 px-3 py-1">
+                    {watchlist.length} {watchlist.length === 1 ? "PIECE" : "PIECES"} SAVED
+                  </span>
+                )}
+              </div>
+
+              {watchlist.length === 0 ? (
+                <div className="text-center py-16 space-y-5">
+                  <div className="w-16 h-16 rounded-full bg-gold/5 border border-gold/20 mx-auto flex items-center justify-center">
+                    <Bookmark size={28} className="text-gold/40" />
+                  </div>
+                  <div>
+                    <h4 className="font-serif text-lg text-white/60 tracking-wide mb-2">Your watchlist is empty</h4>
+                    <p className="font-sans text-[10px] text-white/35 uppercase tracking-widest max-w-xs mx-auto leading-relaxed">
+                      Browse the collection and save pieces that inspire you. They will appear here for easy ordering.
+                    </p>
+                  </div>
+                  <Link
+                    href="/#collection"
+                    className="inline-flex items-center gap-2 px-6 py-3 border border-gold/40 text-gold font-sans text-[8.5px] tracking-[0.3em] uppercase hover:bg-gold/10 transition-colors"
+                  >
+                    EXPLORE COLLECTION
+                  </Link>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {watchlist.map((item) => (
+                    <div
+                      key={item.lookId}
+                      className="border border-gold/15 bg-black/40 overflow-hidden group hover:border-gold/35 transition-colors"
+                    >
+                      {/* Image */}
+                      <div className="relative h-52 overflow-hidden bg-black/60">
+                        {item.image ? (
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Bookmark size={32} className="text-gold/20" />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+                        <div className="absolute bottom-3 left-3 right-3">
+                          <p className="font-serif text-sm text-white tracking-widest leading-tight">{item.title}</p>
+                          <p className="font-sans text-[8px] text-white/60 uppercase tracking-widest mt-0.5">{item.subtitle}</p>
+                        </div>
+                      </div>
+
+                      {/* Details */}
+                      <div className="p-3.5 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="font-serif text-sm text-gold">{item.price || getGarmentPrice(item.title)}</span>
+                          <span className="font-sans text-[7.5px] text-white/35 uppercase tracking-widest">
+                            Saved {new Date(item.addedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                          </span>
+                        </div>
+
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              setWatchlistOrderLook({
+                                id: item.lookId,
+                                title: item.title,
+                                subtitle: item.subtitle,
+                                price: item.price || getGarmentPrice(item.title),
+                                imagePrimary: item.image,
+                              });
+                              setWatchlistOrderModalOpen(true);
+                            }}
+                            className="flex-1 py-2.5 bg-gradient-to-r from-gold via-champagne to-gold text-[#050505] font-sans text-[7.5px] tracking-[0.25em] uppercase font-semibold hover:opacity-90 transition-opacity"
+                          >
+                            ORDER NOW
+                          </button>
+                          <button
+                            onClick={() => removeFromWatchlist(item.lookId)}
+                            className="p-2.5 border border-white/15 text-white/40 hover:border-rose-400/50 hover:text-rose-400 transition-colors"
+                            title="Remove from watchlist"
+                          >
+                            <X size={13} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ORDER MODAL for watchlist items */}
+          <OrderModal
+            isOpen={watchlistOrderModalOpen}
+            onClose={() => { setWatchlistOrderModalOpen(false); setWatchlistOrderLook(null); }}
+            look={watchlistOrderLook}
+          />
 
           {/* TAB 4: MAKE A QUERY FORM */}
           {clientProfileTab === "make_query" && (

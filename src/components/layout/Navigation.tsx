@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, useScroll, useMotionValueEvent, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { Globe, User as UserIcon, Crown, ChevronDown, Check } from "lucide-react";
+import { Globe, User as UserIcon, Crown, ChevronDown, Check, Bookmark } from "lucide-react";
 import Magnetic from "./Magnetic";
 import { useLanguage } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
@@ -17,7 +17,7 @@ export default function Navigation() {
 
   const { scrollY } = useScroll();
   const { language, setLanguage, languages, t } = useLanguage();
-  const { user } = useAuth();
+  const { user, watchlist } = useAuth();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setIsScrolled(latest > 50);
@@ -134,6 +134,21 @@ export default function Navigation() {
               </AnimatePresence>
             </div>
 
+            {/* ── ATELIER WATCHLIST SHORTCUT ── */}
+            <Link
+              href="/login?tab=watchlist"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gold/30 hover:border-gold bg-black/40 text-ivory/90 hover:text-gold transition-colors font-sans text-[9px] tracking-widest uppercase cursor-pointer"
+              title="Atelier Watchlist"
+            >
+              <Bookmark size={11} className={`text-gold ${watchlist.length > 0 ? "fill-gold" : ""}`} />
+              <span>WATCHLIST</span>
+              {watchlist.length > 0 && (
+                <span className="w-4 h-4 rounded-full bg-gold text-[#050505] text-[8px] font-bold flex items-center justify-center font-mono shrink-0">
+                  {watchlist.length}
+                </span>
+              )}
+            </Link>
+
             {/* ── CLIENT / ADMIN AUTH BUTTON ── */}
             <Link
               href="/login"
@@ -219,6 +234,23 @@ export default function Navigation() {
               </Link>
             </motion.div>
           ))}
+
+          {/* Mobile Watchlist Link */}
+          <motion.div
+            variants={{
+              open: { opacity: 1, y: 0, transition: { delay: 0.38, duration: 0.5 } },
+              closed: { opacity: 0, y: 20 },
+            }}
+          >
+            <Link
+              href="/login?tab=watchlist"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center gap-2 font-sans text-xs tracking-[0.25em] text-ivory/80 hover:text-gold uppercase"
+            >
+              <Bookmark size={13} className={`text-gold ${watchlist.length > 0 ? "fill-gold" : ""}`} />
+              <span>WATCHLIST ({watchlist.length})</span>
+            </Link>
+          </motion.div>
 
           {/* Mobile Auth Button */}
           <motion.div

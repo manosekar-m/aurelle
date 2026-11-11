@@ -3,9 +3,12 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import { Bookmark, Crown, CheckCircle2, ShoppingBag } from "lucide-react";
 import { ChapterData } from "@/data/collection";
+import { useAuth } from "@/context/AuthContext";
 import EnquiryForm from "./EnquiryForm";
 import LookReviews from "./LookReviews";
+import OrderModal, { getGarmentPrice } from "./OrderModal";
 
 interface Props {
   look: ChapterData | null;
@@ -289,8 +292,11 @@ function Viewer360({ look, accent }: { look: ChapterData; accent: string }) {
 
 // ── Main Modal ────────────────────────────────────────────────────────────────
 export default function LookDetailModal({ look, onClose }: Props) {
+  const { isInWatchlist, toggleWatchlist } = useAuth();
   const [activeTab, setActiveTab] = useState<"design" | "details" | "care" | "reviews">("design");
   const [enquiryOpen, setEnquiryOpen] = useState(false);
+  const [orderOpen, setOrderOpen] = useState(false);
+  const [watchlistToast, setWatchlistToast] = useState<string | null>(null);
 
   // Close on Escape
   useEffect(() => {
@@ -306,6 +312,25 @@ export default function LookDetailModal({ look, onClose }: Props) {
   }, [look]);
 
   const accent = look ? (accentMap[look.id] ?? "#C5A059") : "#C5A059";
+  const garmentPrice = look ? getGarmentPrice(look.title || look.id) : "€3,500";
+  const inWatchlist = look ? isInWatchlist(look.id) : false;
+
+  const handleWatchlistToggle = () => {
+    if (!look) return;
+    const added = toggleWatchlist({
+      lookId: look.id,
+      title: look.title,
+      subtitle: look.subtitle,
+      price: garmentPrice,
+      image: look.imagePrimary,
+    });
+    setWatchlistToast(
+      added
+        ? `"${look.title}" added to your Watchlist. You can order it now.`
+        : `Removed "${look.title}" from Watchlist.`
+    );
+    setTimeout(() => setWatchlistToast(null), 4500);
+  };
 
   return (
     <AnimatePresence>
@@ -379,13 +404,18 @@ export default function LookDetailModal({ look, onClose }: Props) {
             {/* Header */}
             <div className="shrink-0 px-8 md:px-12 pt-8 pb-6 border-b"
               style={{ borderColor: `${accent}25` }}>
-              <div className="flex items-center gap-3 mb-3">
-                <span className="font-sans text-[8px] tracking-[0.5em]" style={{ color: accent }}>
-                  {look.index}
-                </span>
-                <div className="w-8 h-px" style={{ background: `${accent}80` }} />
-                <span className="font-sans text-[8px] tracking-[0.4em] text-white/40 uppercase">
-                  {look.subtitle}
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <div className="flex items-center gap-3">
+                  <span className="font-sans text-[8px] tracking-[0.5em]" style={{ color: accent }}>
+                    {look.index}
+                  </span>
+                  <div className="w-8 h-px" style={{ background: `${accent}80` }} />
+                  <span className="font-sans text-[8px] tracking-[0.4em] text-white/40 uppercase">
+                    {look.subtitle}
+                  </span>
+                </div>
+                <span className="font-serif text-xl sm:text-2xl text-gold font-semibold">
+                  {garmentPrice}
                 </span>
               </div>
               <h2 className="font-serif text-3xl md:text-4xl text-white tracking-wider mb-2">
@@ -421,6 +451,31 @@ export default function LookDetailModal({ look, onClose }: Props) {
                 </span>
               </button>
             </div>
+
+            {/* Watchlist Confirmation Toast / Order Prompt Banner */}
+            <AnimatePresence>
+              {watchlistToast && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="mx-6 sm:mx-8 md:mx-12 mt-4 p-3 bg-gold/15 border border-gold/40 rounded-sm flex items-center justify-between gap-3 text-xs"
+                >
+                  <div className="flex items-center gap-2 text-gold">
+                    <CheckCircle2 size={16} className="shrink-0" />
+                    <span className="font-sans text-[11px] font-medium leading-tight">{watchlistToast}</span>
+                  </div>
+                  {inWatchlist && (
+                    <button
+                      onClick={() => setOrderOpen(true)}
+                      className="px-3 py-1.5 bg-gold text-[#050505] font-sans text-[8px] tracking-[0.2em] uppercase font-semibold hover:bg-gold/90 transition-colors shrink-0"
+                    >
+                      ORDER NOW
+                    </button>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Tab bar */}
             <div className="shrink-0 flex border-b" style={{ borderColor: `${accent}25` }}>
@@ -661,22 +716,45 @@ export default function LookDetailModal({ look, onClose }: Props) {
             </div>
 
             {/* Footer CTA */}
-            <div className="shrink-0 px-8 md:px-12 py-6 border-t flex gap-4"
-              style={{ borderColor: `${accent}25` }}>
+            <div
+              className="shrink-0 px-6 sm:px-8 md:px-12 py-4 sm:py-5 border-t flex flex-col sm:flex-row gap-2.5 sm:gap-3 bg-[#080808]"
+              style={{ borderColor: `${accent}25` }}
+            >
+              {/* Primary Action: Order Now */}
               <button
-                className="flex-1 py-4 font-sans text-[9px] tracking-[0.3em] uppercase text-[#050505] transition-opacity hover:opacity-80"
+                onClick={() => setOrderOpen(true)}
+                className="flex-1 py-3.5 sm:py-4 font-sans text-[8.5px] sm:text-[9px] tracking-[0.25em] uppercase text-[#050505] font-semibold transition-all hover:brightness-110 flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(197,160,89,0.3)] cursor-pointer"
                 style={{ background: accent }}
                 data-cursor="enter"
               >
-                ADD TO WISHLIST
+                <Crown size={13} />
+                <span>ORDER NOW · {garmentPrice}</span>
               </button>
+
+              {/* Secondary Action: Add to Watchlist */}
+              <button
+                onClick={handleWatchlistToggle}
+                className={`py-3.5 sm:py-4 px-4 font-sans text-[8px] sm:text-[8.5px] tracking-[0.2em] uppercase border transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                  inWatchlist
+                    ? "bg-gold/20 border-gold text-gold font-semibold shadow-[0_0_12px_rgba(197,160,89,0.2)]"
+                    : "border-white/20 text-white/80 hover:border-gold hover:text-white"
+                }`}
+                style={{ borderColor: inWatchlist ? accent : undefined }}
+                data-cursor="enter"
+                title={inWatchlist ? "Remove from Watchlist" : "Save to Watchlist"}
+              >
+                <Bookmark size={13} className={inWatchlist ? "fill-current text-gold" : ""} />
+                <span>{inWatchlist ? "IN WATCHLIST ✓" : "ADD TO WATCHLIST"}</span>
+              </button>
+
+              {/* Tertiary Action: Consultation / Request Enquiry */}
               <button
                 onClick={() => setEnquiryOpen(true)}
-                className="flex-1 py-4 font-sans text-[9px] tracking-[0.3em] uppercase border transition-colors hover:bg-white/5"
-                style={{ borderColor: `${accent}60`, color: accent }}
+                className="py-3.5 sm:py-4 px-3 sm:px-4 font-sans text-[8px] sm:text-[8.5px] tracking-[0.2em] uppercase border transition-colors hover:bg-white/5 text-white/60 hover:text-white cursor-pointer"
+                style={{ borderColor: `${accent}40` }}
                 data-cursor="enter"
               >
-                REQUEST ENQUIRY
+                CONSULTATION
               </button>
             </div>
           </motion.div>
@@ -689,6 +767,14 @@ export default function LookDetailModal({ look, onClose }: Props) {
         onClose={() => setEnquiryOpen(false)}
         lookTitle={look?.title ?? ""}
         lookSubtitle={look?.subtitle ?? ""}
+        accent={accent}
+      />
+
+      {/* Order Placement Modal */}
+      <OrderModal
+        isOpen={orderOpen}
+        onClose={() => setOrderOpen(false)}
+        look={look ? { ...look, price: garmentPrice } : null}
         accent={accent}
       />
     </AnimatePresence>

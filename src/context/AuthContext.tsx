@@ -38,6 +38,15 @@ export interface Query {
   adminReplyDate?: string;
 }
 
+export interface WatchlistItem {
+  lookId: string;
+  title: string;
+  subtitle: string;
+  price: string;
+  image: string;
+  addedAt: string;
+}
+
 export interface OrderItem {
   id: string;
   customerId: string;
@@ -236,6 +245,22 @@ interface AuthContextType {
   orders: OrderItem[];
   orderHistory: OrderItem[];
   updateOrderStatus: (id: string, status: OrderItem["status"]) => void;
+  placeOrder: (orderData: {
+    item: string;
+    subtitle: string;
+    price: string;
+    size: string;
+    customerName: string;
+    customerEmail: string;
+    customerPhone?: string;
+    shippingAddress?: string;
+    specialNotes?: string;
+  }) => OrderItem;
+  watchlist: WatchlistItem[];
+  addToWatchlist: (item: Omit<WatchlistItem, "addedAt">) => void;
+  removeFromWatchlist: (lookId: string) => void;
+  isInWatchlist: (lookId: string) => boolean;
+  toggleWatchlist: (item: Omit<WatchlistItem, "addedAt">) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -253,6 +278,12 @@ const AuthContext = createContext<AuthContextType>({
   orders: DEFAULT_ORDERS,
   orderHistory: DEFAULT_ORDERS,
   updateOrderStatus: () => {},
+  placeOrder: () => DEFAULT_ORDERS[0],
+  watchlist: [],
+  addToWatchlist: () => {},
+  removeFromWatchlist: () => {},
+  isInWatchlist: () => false,
+  toggleWatchlist: () => false,
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -260,6 +291,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [enquiries, setEnquiries] = useState<AtelierEnquiry[]>(DEFAULT_ENQUIRIES);
   const [queries, setQueries] = useState<Query[]>(DEFAULT_QUERIES);
   const [orders, setOrders] = useState<OrderItem[]>(DEFAULT_ORDERS);
+  const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
 
   // Restore stored session and data
   useEffect(() => {
@@ -279,6 +311,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const storedOrders = localStorage.getItem("aurelle_orders");
       if (storedOrders) {
         setOrders(JSON.parse(storedOrders));
+      }
+      const storedWatchlist = localStorage.getItem("aurelle_watchlist");
+      if (storedWatchlist) {
+        setWatchlist(JSON.parse(storedWatchlist));
       }
     } catch {
       // localStorage may fail in some environments
@@ -476,14 +512,111 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Client's order history: user's specific orders, or curated atelier allocations
-  const userOrderHistory = user
-    ? orders.filter(
-        (o) =>
-          o.customerId === user.id ||
-          o.customerEmail.toLowerCase() === user.email.toLowerCase()
-      )
-    : [];
+  const addToWatchlist = (item: Omit<WatchlistItem, "addedAt">) => {
+    setWatchlist((prev) => {
+      if (prev.some((w) => w.lookId === item.lookId)) return prev;
+      const newItem: WatchlistItem = {
+        ...item,
+        addedAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+      };
+      const updated = [newItem, ...prev];
+      try {
+        localStorage.setItem("aurelle_watchlist", JSON.stringify(updated));
+      } catch {
+        // ignore
+      }
+      return updated;
+    });
+  };
+
+  const removeFromWatchlist = (lookId: string) => {
+    setWatchlist((prev) => {
+      const updated = prev.filter((w) => w.lookId !== lookId);
+      try {
+        localStorage.setItem("aurelle_watchlist", JSON.stringify(updated));
+      } catch {
+        // ignore
+      }
+      return updated;
+    });
+  };
+
+  const isInWatchlist = (lookId: string) => {
+    return watchlist.some((w) => w.lookId === lookId);
+  };
+
+  const toggleWatchlist = (item: Omit<WatchlistItem, "addedAt">): boolean => {
+    const exists = watchlist.some((w) => w.lookId === item.lookId);
+    if (exists) {
+      removeFromWatchlist(item.lookId);
+      return false;
+    } else {
+      addToWatchlist(item);
+      return true;
+    }
+  };
+
+  const placeOrder = (orderData: {
+    item: string;
+    subtitle: string;
+    price: string;
+    size: string;
+    customerName: string;
+    customerEmail: string;
+    customerPhone?: string;
+    shippingAddress?: string;
+    specialNotes?: string;
+  }): OrderItem => {
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    const trackingCode = `AUR-${Math.floor(10000 + Math.random() * 90000)}-PAR`;
+    const newOrder: OrderItem = {
+      id: `ORD-${randomNum}`,
+      customerId: user ? user.id : `usr-${Date.now()}`,
+      customerName: orderData.customerName.trim() || (user ? user.name : "Valued Patron"),
+      customerEmail: orderData.customerEmail.trim() || (user ? user.email : "patron@aurelle.com"),
+      customerPhone: orderData.customerPhone?.trim() || user?.phone || "+33 1 42 68 00 00",
+      shippingAddress: orderData.shippingAddress?.trim() || "Private White-Glove Courier Allocation",
+      item: orderData.item.toUpperCase(),
+      subtitle: `${orderData.subtitle} · Size ${orderData.size}${orderData.specialNotes ? ` · ${orderData.specialNotes}` : ""}`,
+      date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+      status: "Processing",
+      price: orderData.price,
+      trackingNumber: trackingCode,
+      updatedAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+    };
+
+    const updated = [newOrder, ...orders];
+    setOrders(updated);
+    try {
+      localStorage.setItem("aurelle_orders", JSON.stringify(updated));
+      const placedIds = JSON.parse(localStorage.getItem("aurelle_placed_order_ids") || "[]");
+      localStorage.setItem("aurelle_placed_order_ids", JSON.stringify([newOrder.id, ...placedIds]));
+    } catch {
+      // ignore
+    }
+    return newOrder;
+  };
+
+  // Client's order history: user's specific orders, locally placed orders, or curated atelier allocations
+  const getPlacedOrderIds = (): string[] => {
+    try {
+      const stored = localStorage.getItem("aurelle_placed_order_ids");
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  };
+
+  const userOrderHistory = orders.filter((o) => {
+    if (user && (o.customerId === user.id || o.customerEmail.toLowerCase() === user.email.toLowerCase())) {
+      return true;
+    }
+    if (typeof window !== "undefined") {
+      const placedIds = getPlacedOrderIds();
+      if (placedIds.includes(o.id)) return true;
+    }
+    return false;
+  });
 
   const effectiveOrderHistory =
     userOrderHistory.length > 0 ? userOrderHistory : orders.slice(0, 3);
@@ -505,6 +638,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         orders,
         orderHistory: effectiveOrderHistory,
         updateOrderStatus,
+        placeOrder,
+        watchlist,
+        addToWatchlist,
+        removeFromWatchlist,
+        isInWatchlist,
+        toggleWatchlist,
       }}
     >
       {children}
