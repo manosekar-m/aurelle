@@ -31,12 +31,12 @@ const SIZES = [
 
 export const getGarmentPrice = (titleOrId: string = ""): string => {
   const norm = titleOrId.toLowerCase().replace(/[^a-z0-9]/g, "");
-  if (norm.includes("spotlight")) return "€4,850";
-  if (norm.includes("prelude")) return "€2,750";
-  if (norm.includes("flapper")) return "€3,200";
-  if (norm.includes("afterglow")) return "€3,600";
-  if (norm.includes("midnight") || norm.includes("rebel")) return "€2,450";
-  return "€3,500";
+  if (norm.includes("spotlight")) return "€2,490";
+  if (norm.includes("prelude")) return "€1,390";
+  if (norm.includes("flapper")) return "€1,650";
+  if (norm.includes("afterglow")) return "€1,850";
+  if (norm.includes("midnight") || norm.includes("rebel")) return "€1,250";
+  return "€1,750";
 };
 
 export default function OrderModal({ isOpen, onClose, look, accent = "#C5A059" }: Props) {

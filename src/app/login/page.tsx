@@ -56,17 +56,17 @@ interface RevenuePoint {
 }
 
 const REVENUE_HISTORY: RevenuePoint[] = [
-  { month: "January", short: "Jan", revenue: 8400, ordersCount: 2, topGarment: "THE PRELUDE", change: "+12%" },
-  { month: "February", short: "Feb", revenue: 11200, ordersCount: 3, topGarment: "THE SPOTLIGHT", change: "+18%" },
-  { month: "March", short: "Mar", revenue: 14600, ordersCount: 4, topGarment: "THE FLAPPER", change: "+24%" },
-  { month: "April", short: "Apr", revenue: 9800, ordersCount: 3, topGarment: "THE PRELUDE", change: "-8%" },
-  { month: "May", short: "May", revenue: 16500, ordersCount: 5, topGarment: "THE SPOTLIGHT", change: "+32%" },
-  { month: "June", short: "Jun", revenue: 19200, ordersCount: 6, topGarment: "THE AFTERGLOW", change: "+16%" },
-  { month: "July", short: "Jul", revenue: 15400, ordersCount: 4, topGarment: "THE FLAPPER", change: "+8%" },
-  { month: "August", short: "Aug", revenue: 12100, ordersCount: 3, topGarment: "THE PRELUDE", change: "+10%" },
-  { month: "September", short: "Sep", revenue: 22800, ordersCount: 7, topGarment: "THE SPOTLIGHT", change: "+45%" },
-  { month: "October", short: "Oct", revenue: 28600, ordersCount: 8, topGarment: "THE SPOTLIGHT", change: "+26%" },
-  { month: "November", short: "Nov", revenue: 42800, ordersCount: 11, topGarment: "THE SPOTLIGHT", change: "+50%" },
+  { month: "January", short: "Jan", revenue: 4200, ordersCount: 2, topGarment: "THE PRELUDE", change: "+12%" },
+  { month: "February", short: "Feb", revenue: 5600, ordersCount: 3, topGarment: "THE SPOTLIGHT", change: "+18%" },
+  { month: "March", short: "Mar", revenue: 7300, ordersCount: 4, topGarment: "THE FLAPPER", change: "+24%" },
+  { month: "April", short: "Apr", revenue: 4900, ordersCount: 3, topGarment: "THE PRELUDE", change: "-8%" },
+  { month: "May", short: "May", revenue: 8250, ordersCount: 5, topGarment: "THE SPOTLIGHT", change: "+32%" },
+  { month: "June", short: "Jun", revenue: 9600, ordersCount: 6, topGarment: "THE AFTERGLOW", change: "+16%" },
+  { month: "July", short: "Jul", revenue: 7700, ordersCount: 4, topGarment: "THE FLAPPER", change: "+8%" },
+  { month: "August", short: "Aug", revenue: 6050, ordersCount: 3, topGarment: "THE PRELUDE", change: "+10%" },
+  { month: "September", short: "Sep", revenue: 11400, ordersCount: 7, topGarment: "THE SPOTLIGHT", change: "+45%" },
+  { month: "October", short: "Oct", revenue: 14300, ordersCount: 8, topGarment: "THE SPOTLIGHT", change: "+26%" },
+  { month: "November", short: "Nov", revenue: 21400, ordersCount: 11, topGarment: "THE SPOTLIGHT", change: "+50%" },
 ];
 
 export default function LoginPage() {
@@ -773,11 +773,11 @@ export default function LoginPage() {
 
                   <div className="space-y-3.5 sm:space-y-4">
                     {[
-                      { city: "Paris (Flagship Store)", share: "38%", amount: "€76,532" },
-                      { city: "Milan (Fashion Suite)", share: "24%", amount: "€48,336" },
-                      { city: "Dubai (Emirates Store)", share: "20%", amount: "€40,280" },
-                      { city: "New York (Private Client)", share: "12%", amount: "€24,168" },
-                      { city: "Zurich (Luxury Store)", share: "6%", amount: "€12,084" },
+                      { city: "Paris (Flagship Store)", share: "38%", amount: "€38,266" },
+                      { city: "Milan (Fashion Suite)", share: "24%", amount: "€24,168" },
+                      { city: "Dubai (Emirates Store)", share: "20%", amount: "€20,140" },
+                      { city: "New York (Private Client)", share: "12%", amount: "€12,084" },
+                      { city: "Zurich (Luxury Store)", share: "6%", amount: "€6,042" },
                     ].map((salon) => (
                       <div key={salon.city} className="space-y-1">
                         <div className="flex justify-between text-xs font-sans">
@@ -803,11 +803,11 @@ export default function LoginPage() {
 
                   <div className="space-y-3.5 sm:space-y-4">
                     {[
-                      { name: "THE SPOTLIGHT (Emerald Gown)", pct: "42%", total: "€84,588" },
-                      { name: "THE FLAPPER (Beaded Fringe)", pct: "26%", total: "€52,364" },
-                      { name: "THE PRELUDE (Velvet Cocktail Dress)", pct: "18%", total: "€36,252" },
-                      { name: "THE AFTERGLOW (Silver Metallic Jumpsuit)", pct: "10%", total: "€20,140" },
-                      { name: "MIDNIGHT REBEL (Asymmetric)", pct: "4%", total: "€8,056" },
+                      { name: "THE SPOTLIGHT (Emerald Gown)", pct: "42%", total: "€42,294" },
+                      { name: "THE FLAPPER (Beaded Fringe)", pct: "26%", total: "€26,182" },
+                      { name: "THE PRELUDE (Velvet Cocktail Dress)", pct: "18%", total: "€18,126" },
+                      { name: "THE AFTERGLOW (Silver Metallic Jumpsuit)", pct: "10%", total: "€10,070" },
+                      { name: "MIDNIGHT REBEL (Asymmetric)", pct: "4%", total: "€4,028" },
                     ].map((dress) => (
                       <div key={dress.name} className="space-y-1">
                         <div className="flex justify-between text-xs font-sans">
@@ -835,11 +835,11 @@ export default function LoginPage() {
                     <div className="space-y-3 sm:space-y-4 font-sans text-xs">
                       <div className="flex justify-between py-2 border-b border-white/5">
                         <span className="text-white/50 uppercase text-[8px] tracking-wider">Average Order Value (AOV)</span>
-                        <span className="text-white font-mono font-medium">€3,420</span>
+                        <span className="text-white font-mono font-medium">€1,710</span>
                       </div>
                       <div className="flex justify-between py-2 border-b border-white/5">
                         <span className="text-white/50 uppercase text-[8px] tracking-wider">Peak Single Order</span>
-                        <span className="text-gold font-mono font-medium">€6,850</span>
+                        <span className="text-gold font-mono font-medium">€3,490</span>
                       </div>
                       <div className="flex justify-between py-2 border-b border-white/5">
                         <span className="text-white/50 uppercase text-[8px] tracking-wider">VIP Patron Retention</span>
